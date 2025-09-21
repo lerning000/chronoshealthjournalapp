@@ -43,15 +43,11 @@ function App() {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.header}>
-            <Text style={styles.dateText}>{getCurrentDate()}</Text>
-            <Text style={styles.subtitle}>How are you feeling today?</Text>
+            <Text style={styles.dateText}>{getCurrentDate().toUpperCase()}</Text>
           </View>
           
           <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.label}>Physical Health</Text>
-              <Text style={styles.sectionDescription}>Rate your physical wellbeing</Text>
-            </View>
+            <Text style={styles.label}>PHYSICAL HEALTH</Text>
             <RatingSelector
               rating={physicalHealth}
               onRatingChange={setPhysicalHealth}
@@ -59,10 +55,7 @@ function App() {
           </View>
 
           <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.label}>Mental Health</Text>
-              <Text style={styles.sectionDescription}>Rate your mental wellbeing</Text>
-            </View>
+            <Text style={styles.label}>MENTAL HEALTH</Text>
             <RatingSelector
               rating={mentalHealth}
               onRatingChange={setMentalHealth}
@@ -70,10 +63,7 @@ function App() {
           </View>
 
           <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.label}>Journal Entry</Text>
-              <Text style={styles.sectionDescription}>Share your thoughts and experiences</Text>
-            </View>
+            <Text style={styles.label}>JOURNAL ENTRY</Text>
             <TextInput
               style={[styles.textInput, styles.largeTextInput]}
               value={entry}
@@ -101,61 +91,33 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     paddingHorizontal: 24,
-    paddingTop: 20,
+    paddingTop: 40,
     paddingBottom: 40,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 40,
-    paddingTop: 20,
+    marginBottom: 60,
   },
   dateText: {
     color: '#FFFFFF',
     fontSize: 28,
     fontWeight: '700',
     textAlign: 'center',
-    marginBottom: 8,
     letterSpacing: 0.5,
     fontFamily: 'Alegreya',
   },
-  subtitle: {
-    color: '#B0B0B0',
-    fontSize: 16,
-    textAlign: 'center',
-    fontWeight: '400',
-    fontFamily: 'Alegreya',
-  },
   section: {
-    marginBottom: 32,
-    backgroundColor: '#1A1A1A',
-    borderRadius: 16,
-    padding: 20,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  sectionHeader: {
-    marginBottom: 16,
+    marginBottom: 48,
+    alignItems: 'center',
   },
   label: {
     color: '#FFFFFF',
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: '600',
-    marginBottom: 4,
-    letterSpacing: 0.3,
+    marginBottom: 24,
+    letterSpacing: 1.2,
     fontFamily: 'Alegreya',
-  },
-  sectionDescription: {
-    color: '#888888',
-    fontSize: 14,
-    fontWeight: '400',
-    lineHeight: 20,
-    fontFamily: 'Alegreya',
+    textAlign: 'center',
   },
   textInput: {
     backgroundColor: '#2A2A2A',
@@ -167,6 +129,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#333333',
     fontFamily: 'Alegreya',
+    width: '100%',
   },
   largeTextInput: {
     minHeight: 140,

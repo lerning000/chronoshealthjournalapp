@@ -36,23 +36,18 @@ const RatingSelector: React.FC<RatingSelectorProps> = ({ rating, onRatingChange 
       <View style={styles.ratingContainer}>
         {Array.from({ length: 11 }, (_, index) => renderCircle(index))}
       </View>
-      <Text style={styles.ratingText}>
-        {rating === 0 ? 'Not rated' : `${rating}/10`}
-      </Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'flex-start',
-    marginVertical: 8,
+    alignItems: 'center',
   },
   ratingContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
     width: '100%',
   },
   circle: {
@@ -80,13 +75,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderWidth: 2,
     borderColor: '#666666',
-  },
-  ratingText: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    fontWeight: '500',
-    opacity: 0.8,
-    fontFamily: 'Alegreya',
   },
 });
 
