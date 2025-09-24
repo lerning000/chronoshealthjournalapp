@@ -123,10 +123,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     color: '#FFFFFF',
     fontSize: 16,
-    minHeight: 120,
+    height: 250,
     fontFamily: 'Alegreya-Regular',
     width: '100%',
     lineHeight: 24,
+    borderRadius: 15,
   },
 });
 

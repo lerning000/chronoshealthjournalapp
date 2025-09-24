@@ -8,9 +8,11 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { StatusBar } from 'react-native';
+import { StatusBar, Image } from 'react-native';
 import JournalScreen from './JournalScreen';
 import PastEntriesScreen from './PastEntriesScreen';
+
+const journalIcon = require('./assets/icons/journal_icon.png');
 
 const Tab = createBottomTabNavigator();
 
@@ -21,6 +23,7 @@ function App() {
       <NavigationContainer>
         <Tab.Navigator
           screenOptions={{
+            headerShown: false,
             tabBarStyle: {
               backgroundColor: '#0A0A0A',
               borderTopColor: '#333333',
@@ -28,6 +31,7 @@ function App() {
               height: 60,
               paddingBottom: 8,
               paddingTop: 8,
+              bottom: 35,
             },
             tabBarActiveTintColor: '#FFFFFF',
             tabBarInactiveTintColor: '#888888',
@@ -58,6 +62,13 @@ function App() {
             options={{
               title: 'Journal',
               headerTitle: 'JOURNAL',
+              tabBarShowLabel: false,
+              tabBarIcon: ({ focused }) => (
+                <Image 
+                  source={journalIcon} 
+                  style={{ width: 30, height: 30 }}
+                />
+              ),
             }}
           />
           <Tab.Screen

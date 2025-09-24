@@ -1,6 +1,6 @@
 /**
  * Past Entries Screen
- * Displays past journal entries with search functionality
+ * Displays a single selected journal entry with date selection
  *
  * @format
  */
@@ -10,79 +10,50 @@ import {
   SafeAreaView,
   View,
   Text,
-  TextInput,
-  ScrollView,
   StyleSheet,
 } from 'react-native';
 import RatingSelector from './RatingSelector';
 
 function PastEntriesScreen() {
-  const [searchQuery, setSearchQuery] = useState('');
-
-  // Placeholder data for example entries
-  const exampleEntries = [
-    {
-      id: 1,
-      date: 'AUGUST 1, 2025',
-      physicalHealth: 5,
-      mentalHealth: 7,
-      entry: 'Had a great workout this morning. Feeling energized and motivated for the day ahead. The weather was perfect for a run.',
-    },
-    {
-      id: 2,
-      date: 'JULY 31, 2025',
-      physicalHealth: 3,
-      mentalHealth: 4,
-      entry: 'Feeling a bit under the weather today. Took it easy and focused on self-care. Sometimes rest is the best medicine.',
-    },
-  ];
-
-  const renderEntry = (entry: any) => (
-    <View key={entry.id} style={styles.entryContainer}>
-      <Text style={styles.dateText}>{entry.date}</Text>
-      
-      <View style={styles.ratingSection}>
-        <Text style={styles.sectionLabel}>PHYSICAL HEALTH</Text>
-        <RatingSelector
-          rating={entry.physicalHealth}
-          onRatingChange={() => {}} // Read-only for past entries
-        />
-      </View>
-
-      <View style={styles.ratingSection}>
-        <Text style={styles.sectionLabel}>MENTAL HEALTH</Text>
-        <RatingSelector
-          rating={entry.mentalHealth}
-          onRatingChange={() => {}} // Read-only for past entries
-        />
-      </View>
-
-      <View style={styles.entrySection}>
-        <Text style={styles.sectionLabel}>ENTRY</Text>
-        <Text style={styles.entryText}>{entry.entry}</Text>
-      </View>
-
-      <View style={styles.separator} />
-    </View>
-  );
+  const [selectedEntry] = useState(null);
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        <TextInput
-          style={styles.searchBar}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          placeholder="SEARCH MONTH, DAY..."
-          placeholderTextColor="#888888"
-        />
-        
-        <ScrollView 
-          style={styles.scrollView}
-          showsVerticalScrollIndicator={false}
-        >
-          {exampleEntries.map(renderEntry)}
-        </ScrollView>
+        {/* Date Selectors */}
+        <View style={styles.dateSelectors}>
+          <Text style={styles.dateLabel}>YEAR</Text>
+          <Text style={styles.dateLabel}>MONTH</Text>
+          <Text style={styles.dateLabel}>DAY</Text>
+        </View>
+
+        {/* Main Content Area */}
+        <View style={styles.mainContent}>
+          <View style={styles.section}>
+            <Text style={styles.label}>PHYSICAL HEALTH</Text>
+            <RatingSelector
+              rating={selectedEntry ? selectedEntry.physical : 0}
+              onRatingChange={() => {}} // Read-only for past entries
+            />
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.label}>MENTAL HEALTH</Text>
+            <RatingSelector
+              rating={selectedEntry ? selectedEntry.mental : 0}
+              onRatingChange={() => {}} // Read-only for past entries
+            />
+          </View>
+
+          <View style={styles.section}>
+            <Text style={styles.label}>ENTRY</Text>
+            <View style={styles.entryTextBox}>
+              <Text style={styles.entryText}>
+                {selectedEntry ? selectedEntry.text : ''}
+              </Text>
+            </View>
+          </View>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -96,55 +67,47 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingTop: 40,
   },
-  searchBar: {
-    backgroundColor: '#2A2A2A',
+  dateSelectors: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 60,
+    paddingHorizontal: 20,
+  },
+  dateLabel: {
     color: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
     fontSize: 16,
-    marginBottom: 24,
-    fontFamily: 'Alegreya-Regular',
+    fontWeight: '600',
+    letterSpacing: 1.2,
   },
-  scrollView: {
+  mainContent: {
     flex: 1,
   },
-  entryContainer: {
-    marginBottom: 24,
+  section: {
+    marginBottom: 50,
+    alignItems: 'flex-start',
   },
-  dateText: {
+  label: {
     color: '#FFFFFF',
-    fontSize: 20,
-    fontWeight: '700',
-    marginBottom: 20,
-    letterSpacing: 0.5,
-    fontFamily: 'Alegreya-Regular',
-  },
-  ratingSection: {
-    marginBottom: 20,
-  },
-  sectionLabel: {
-    color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '600',
-    marginBottom: 12,
+    marginBottom: 24,
     letterSpacing: 1.2,
-    fontFamily: 'Alegreya-Regular',
+    textAlign: 'left',
   },
-  entrySection: {
-    marginBottom: 20,
+  entryTextBox: {
+    borderWidth: 1,
+    borderColor: 'white',
+    borderRadius: 15,
+    height: 250,
+    padding: 10,
+    width: '100%',
   },
   entryText: {
     color: '#FFFFFF',
     fontSize: 16,
     lineHeight: 24,
-    fontFamily: 'Alegreya-Regular',
-  },
-  separator: {
-    height: 1,
-    backgroundColor: '#333333',
-    marginTop: 8,
   },
 });
 
