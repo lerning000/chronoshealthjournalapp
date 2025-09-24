@@ -49,5 +49,10 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Alegreya-Regular.ttf</string>
+		<string>Alegreya-Bold.ttf</string>
+	</array>
 </dict>
 </plist>
