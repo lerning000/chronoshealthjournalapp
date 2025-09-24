@@ -127,7 +127,10 @@ const styles = StyleSheet.create({
     fontFamily: 'Alegreya-Regular',
     width: '100%',
     lineHeight: 24,
+    borderWidth: 1,
+    borderColor: 'white',
     borderRadius: 15,
+    padding: 10,
   },
 });
 

@@ -13,6 +13,7 @@ import JournalScreen from './JournalScreen';
 import PastEntriesScreen from './PastEntriesScreen';
 
 const journalIcon = require('./assets/icons/journal_icon.png');
+const pastEntriesIcon = require('./assets/icons/past_entries_icon.png');
 
 const Tab = createBottomTabNavigator();
 
@@ -77,6 +78,13 @@ function App() {
             options={{
               title: 'History',
               headerTitle: 'HISTORY',
+              tabBarShowLabel: false,
+              tabBarIcon: ({ focused }) => (
+                <Image 
+                  source={pastEntriesIcon} 
+                  style={{ width: 30, height: 30 }}
+                />
+              ),
             }}
           />
         </Tab.Navigator>

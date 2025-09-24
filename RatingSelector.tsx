@@ -59,10 +59,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   filledCircle: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: 'white',
     borderWidth: 2,
-    borderColor: '#4CAF50',
-    shadowColor: '#4CAF50',
+    borderColor: 'white',
+    shadowColor: 'white',
     shadowOffset: {
       width: 0,
       height: 2,
