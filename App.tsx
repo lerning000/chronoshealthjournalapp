@@ -48,8 +48,9 @@ function App() {
               bottom: 35,
             },
             tabBarActiveTintColor: COLORS.foreground,
-            tabBarInactiveTintColor: '#666666',
+            tabBarInactiveTintColor: COLORS.foreground,
             tabBarLabelStyle: {
+              color: COLORS.foreground,
               fontSize: 12,
               fontWeight: '600',
               fontFamily: 'Alegreya-Bold',

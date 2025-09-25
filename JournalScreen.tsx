@@ -208,16 +208,16 @@ function JournalScreen() {
           <View style={styles.section}>
             <Text style={styles.label}>PHYSICAL HEALTH</Text>
             <RatingSelector
-              rating={physicalHealth ?? -1}
-              onRatingChange={handlePhysicalHealthChange}
+              value={physicalHealth}
+              onChange={handlePhysicalHealthChange}
             />
           </View>
 
           <View style={styles.section}>
             <Text style={styles.label}>MENTAL HEALTH</Text>
             <RatingSelector
-              rating={mentalHealth ?? -1}
-              onRatingChange={handleMentalHealthChange}
+              value={mentalHealth}
+              onChange={handleMentalHealthChange}
             />
           </View>
 
@@ -227,8 +227,6 @@ function JournalScreen() {
               style={styles.textInput}
               value={entry}
               onChangeText={handleTextChange}
-              placeholder="Write your thoughts, experiences, or anything else you'd like to record..."
-              placeholderTextColor={COLORS.foreground}
               multiline
               textAlignVertical="top"
             />

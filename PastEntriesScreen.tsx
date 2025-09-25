@@ -51,8 +51,8 @@ function PastEntriesScreen() {
               <View style={styles.section}>
                 <Text style={styles.label}>PHYSICAL HEALTH</Text>
                 <RatingSelector
-                  rating={selectedEntry ? selectedEntry.physical : null}
-                  onRatingChange={() => {}} // Read-only for past entries
+                  value={selectedEntry ? selectedEntry.physical : null}
+                  onChange={() => {}} // Read-only for past entries
                   readOnly={true}
                 />
               </View>
@@ -60,8 +60,8 @@ function PastEntriesScreen() {
               <View style={styles.section}>
                 <Text style={styles.label}>MENTAL HEALTH</Text>
                 <RatingSelector
-                  rating={selectedEntry ? selectedEntry.mental : null}
-                  onRatingChange={() => {}} // Read-only for past entries
+                  value={selectedEntry ? selectedEntry.mental : null}
+                  onChange={() => {}} // Read-only for past entries
                   readOnly={true}
                 />
               </View>
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   noDateText: {
-    color: '#666666',
+    color: COLORS.foreground,
     fontSize: 16,
     fontFamily: 'Alegreya-Regular',
     textAlign: 'center',

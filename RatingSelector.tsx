@@ -8,17 +8,18 @@ import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { COLORS } from './src/theme/colors';
 
 interface RatingSelectorProps {
-  rating: number | null; // null for unset, -1 for unset, 0-10 for actual ratings
-  onRatingChange: (rating: number) => void;
-  readOnly?: boolean; // when true, blocks taps and shows static rating
+  value: number | null;
+  onChange?: (v: number) => void;
+  readOnly?: boolean;
+  color?: string;
 }
 
-const RatingSelector: React.FC<RatingSelectorProps> = ({ rating, onRatingChange, readOnly = false }) => {
+const RatingSelector: React.FC<RatingSelectorProps> = ({ value, onChange, readOnly = false, color }) => {
   const renderCircle = (index: number) => {
-    // Show filled circles only if rating is set (>= 0) and this index is <= rating
+    // Show filled circles only if value is set (>= 0) and this index is <= value
     // Handle both null and -1 as "unset"
-    const numericRating = rating === null ? -1 : rating;
-    const isFilled = numericRating >= 0 && index <= numericRating;
+    const numericValue = value === null ? -1 : value;
+    const isFilled = numericValue >= 0 && index <= numericValue;
     
     const circleElement = (
       <View
@@ -41,7 +42,7 @@ const RatingSelector: React.FC<RatingSelectorProps> = ({ rating, onRatingChange,
           styles.circle,
           isFilled ? styles.filledCircle : styles.outlinedCircle
         ]}
-        onPress={() => onRatingChange(index)}
+        onPress={() => onChange?.(index)}
         activeOpacity={0.6}
         accessibilityRole="button"
         accessibilityLabel={`Rate ${index} out of 10`}
@@ -80,7 +81,7 @@ const styles = StyleSheet.create({
   filledCircle: {
     backgroundColor: COLORS.foreground,
     borderWidth: 2,
-    borderColor: COLORS.border,
+    borderColor: COLORS.foreground,
     shadowColor: COLORS.foreground,
     shadowOffset: {
       width: 0,
@@ -93,7 +94,7 @@ const styles = StyleSheet.create({
   outlinedCircle: {
     backgroundColor: 'transparent',
     borderWidth: 2,
-    borderColor: '#666666',
+    borderColor: COLORS.foreground,
   },
 });
 
