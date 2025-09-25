@@ -7,13 +7,14 @@ import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 
 interface RatingSelectorProps {
-  rating: number;
+  rating: number; // -1 for unset/null, 0-10 for actual ratings
   onRatingChange: (rating: number) => void;
 }
 
 const RatingSelector: React.FC<RatingSelectorProps> = ({ rating, onRatingChange }) => {
   const renderCircle = (index: number) => {
-    const isFilled = index <= rating;
+    // Show filled circles only if rating is set (>= 0) and this index is <= rating
+    const isFilled = rating >= 0 && index <= rating;
     
     return (
       <TouchableOpacity

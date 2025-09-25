@@ -39,7 +39,7 @@ function App() {
             tabBarLabelStyle: {
               fontSize: 12,
               fontWeight: '600',
-              fontFamily: 'Alegreya-Regular',
+              fontFamily: 'Alegreya-Bold',
               letterSpacing: 0.5,
             },
             headerStyle: {
@@ -51,7 +51,7 @@ function App() {
               color: '#FFFFFF',
               fontSize: 18,
               fontWeight: '700',
-              fontFamily: 'Alegreya-Regular',
+              fontFamily: 'Alegreya-Bold',
               letterSpacing: 0.3,
             },
             headerTintColor: '#FFFFFF',

@@ -80,6 +80,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     letterSpacing: 1.2,
+    fontFamily: 'Alegreya-Bold',
   },
   mainContent: {
     flex: 1,
@@ -95,6 +96,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     letterSpacing: 1.2,
     textAlign: 'left',
+    fontFamily: 'Alegreya-Bold',
   },
   entryTextBox: {
     borderWidth: 1,
@@ -108,6 +110,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     lineHeight: 24,
+    fontFamily: 'Alegreya-Regular',
   },
 });
 

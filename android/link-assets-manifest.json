@@ -1,0 +1,13 @@
+{
+  "migIndex": 1,
+  "data": [
+    {
+      "path": "assets/fonts/Alegreya-Bold.ttf",
+      "sha1": "378a0251aa2bc9535d04ff7de36db6094be6b475"
+    },
+    {
+      "path": "assets/fonts/Alegreya-Regular.ttf",
+      "sha1": "c90a4808ab74b8f01db6fb6de9427ce4013ce32d"
+    }
+  ]
+}
