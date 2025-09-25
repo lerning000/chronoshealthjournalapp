@@ -104,47 +104,54 @@ function PastEntriesScreen() {
     <SafeAreaView style={[styles.container, { backgroundColor: COLORS.background }]}>
       <View style={styles.content}>
         {/* Date Selectors */}
-        <View style={styles.dateSelectors}>
-          <View style={styles.pickerContainer}>
-            <Text style={styles.dateLabel}>YEAR</Text>
+        <View style={styles.headerWrap}>
+          <View style={styles.row}>
+          <View style={styles.selectorCol}>
+            <Text style={styles.selectorLabel}>YEAR</Text>
             <Pressable
-              style={styles.pickerButton}
+              style={styles.selectorBtn}
               onPress={() => setYearModalVisible(true)}
+              testID="year-btn"
             >
-              <Text style={styles.pickerButtonText}>
+              <Text style={styles.selectorText}>
                 {year == null ? 'Select' : year.toString()}
               </Text>
             </Pressable>
           </View>
 
-          <View style={styles.pickerContainer}>
-            <Text style={styles.dateLabel}>MONTH</Text>
+          <View style={styles.selectorCol}>
+            <Text style={styles.selectorLabel}>MONTH</Text>
             <Pressable
-              style={[styles.pickerButton, !hasYear && styles.pickerButtonDisabled]}
+              style={styles.selectorBtn}
               onPress={() => {
                 if (!hasYear) return;
                 setMonthModalVisible(true);
               }}
+              disabled={!hasYear}
+              testID="month-btn"
             >
-              <Text style={[styles.pickerButtonText, !hasYear && styles.pickerButtonTextDisabled]}>
+              <Text style={styles.selectorText}>
                 {!hasYear ? 'Select' : month == null ? 'Select' : new Date(2000, month - 1, 1).toLocaleString(undefined, { month: 'long' })}
               </Text>
             </Pressable>
           </View>
 
-          <View style={styles.pickerContainer}>
-            <Text style={styles.dateLabel}>DAY</Text>
+          <View style={styles.selectorCol}>
+            <Text style={styles.selectorLabel}>DAY</Text>
             <Pressable
-              style={[styles.pickerButton, !hasMonth && styles.pickerButtonDisabled]}
+              style={styles.selectorBtn}
               onPress={() => {
                 if (!hasMonth) return;
                 setDayModalVisible(true);
               }}
+              disabled={!hasMonth}
+              testID="day-btn"
             >
-              <Text style={[styles.pickerButtonText, !hasMonth && styles.pickerButtonTextDisabled]}>
+              <Text style={styles.selectorText}>
                 {!hasMonth ? 'Select' : day == null ? 'Select' : day.toString()}
               </Text>
             </Pressable>
+          </View>
           </View>
         </View>
 
@@ -244,45 +251,48 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 40,
   },
-  dateSelectors: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 60,
-    paddingHorizontal: 20,
+  headerWrap: {
+    width: '100%',
+    maxWidth: 360,
+    alignSelf: 'center',
   },
-  dateLabel: {
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'flex-start',
+    paddingHorizontal: 16,
+    marginTop: 8,
+    marginBottom: 60,
+  },
+  selectorCol: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  selectorLabel: {
+    fontFamily: 'Alegreya-Bold',
     color: COLORS.foreground,
+    letterSpacing: 1,
+    marginBottom: 8,
     fontSize: 16,
     fontWeight: '600',
-    letterSpacing: 1.2,
-    fontFamily: 'Alegreya-Bold',
-    marginBottom: 8,
   },
-  pickerContainer: {
-    flex: 1,
-    marginHorizontal: 5,
-  },
-  pickerButton: {
-    backgroundColor: 'transparent',
+  selectorBtn: {
+    minWidth: 120,
+    height: 44,
+    paddingHorizontal: 12,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: COLORS.foreground,
-    borderRadius: 8,
-    padding: 12,
-    minHeight: 44,
+    backgroundColor: 'transparent',
+    alignItems: 'center',
     justifyContent: 'center',
+    opacity: 1,
   },
-  pickerButtonDisabled: {
-    opacity: 0.5,
-  },
-  pickerButtonText: {
+  selectorText: {
     color: COLORS.foreground,
-    fontSize: 16,
     fontFamily: 'Alegreya-Regular',
+    fontSize: 16,
     textAlign: 'center',
-  },
-  pickerButtonTextDisabled: {
-    color: COLORS.foreground,
-    opacity: 0.5,
   },
   mainContent: {
     flex: 1,
