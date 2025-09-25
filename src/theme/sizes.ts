@@ -1,7 +1,7 @@
 export const SIZES = {
-  entryBoxHeight: 240,  // was 200 — extend farther down
+  entryBoxHeight: 240,  // keep tall entry box
   headerMaxWidth: 420,
   headerGap: 12,
-  sectionGap: 24,       // was 16 — more vertical space between sections
-  pageBottomPad: 36     // new — extra bottom padding for ScrollViews
+  sectionGap: 28,       // was 24 → more vertical gap between sections
+  pageBottomPad: 40
 } as const;

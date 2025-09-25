@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
     color: COLORS.foreground,
     fontFamily: 'Alegreya-Bold',
     letterSpacing: 1,
-    marginBottom: 8,            // a touch more separation from dots/box
+    marginBottom: 12,   // was 6–8 → more space between label and circles/box
   },
   entryBox: {
     height: SIZES.entryBoxHeight,   // use the shared height
