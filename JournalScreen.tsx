@@ -20,7 +20,7 @@ import {
   Pressable,
 } from 'react-native';
 import RatingSelector from './RatingSelector';
-import { getDraft, saveDraft, finalizeDate, clearDraft, hasContent, Draft } from '../storage/entries';
+import { getDraft, saveDraft, finalizeDate, clearDraft, hasContent, Draft } from './src/storage/entries';
 import { COLORS } from './src/theme/colors';
 
 // Helper function to format date as YYYY-MM-DD
