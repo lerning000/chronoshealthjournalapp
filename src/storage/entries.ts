@@ -29,6 +29,18 @@ function saveAllEntriesToStorage(entries: Entry[]): void {
   }
 }
 
+// Returns true if the draft/entry has any meaningful content
+export function hasContent(params: {
+  physical?: number | null;
+  mental?: number | null;
+  text?: string | null | undefined;
+}): boolean {
+  const p = typeof params.physical === 'number' ? params.physical : 0;
+  const m = typeof params.mental === 'number' ? params.mental : 0;
+  const t = (params.text ?? '').trim();
+  return p > 0 || m > 0 || t.length > 0;
+}
+
 export type Entry = {
   id: string;
   date: string;        // 'YYYY-MM-DD'
@@ -177,15 +189,10 @@ export function finalizeDate(date: string): void {
       return; // No draft to finalize
     }
     
-    // Check if draft has any content worth saving
-    const hasContent = 
-      (draft.text && draft.text.trim().length > 0) ||
-      (typeof draft.physical === 'number') ||
-      (typeof draft.mental === 'number');
-    
-    if (!hasContent) {
+    // Check if draft has any meaningful content
+    if (!hasContent(draft)) {
       clearDraft(date);
-      return; // Nothing to save
+      return; // Nothing to save, no empty entry written
     }
     
     // Get existing entry to preserve ID if it exists
@@ -195,9 +202,9 @@ export function finalizeDate(date: string): void {
     const entry: Entry = {
       id: existingEntry?.id ?? `${date}-${Date.now()}`,
       date,
-      physical: typeof draft.physical === 'number' ? draft.physical : 0,
-      mental: typeof draft.mental === 'number' ? draft.mental : 0,
-      text: draft.text ?? '',
+      physical: Number.isFinite(draft.physical) ? draft.physical! : 0,
+      mental: Number.isFinite(draft.mental) ? draft.mental! : 0,
+      text: (draft.text ?? '').trim(),
       updatedAt: Date.now(),
     };
     
@@ -249,4 +256,11 @@ export function seedDummyEntries(): void {
   } catch (error) {
     console.error('Error seeding dummy entries:', error);
   }
+}
+
+// Helper for convenience - clears draft if it has no content
+export function clearIfEmpty(date: string): void {
+  const d = getDraft(date);
+  if (!d) return;
+  if (!hasContent(d)) clearDraft(date);
 }

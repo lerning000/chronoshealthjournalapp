@@ -17,9 +17,10 @@ import {
   ScrollView,
   AppState,
   AppStateStatus,
+  Pressable,
 } from 'react-native';
 import RatingSelector from './RatingSelector';
-import { getDraft, saveDraft, finalizeDate, Draft } from './src/storage/entries';
+import { getDraft, saveDraft, finalizeDate, clearDraft, hasContent, Draft } from './src/storage/entries';
 import { COLORS } from './src/theme/colors';
 
 // Helper function to format date as YYYY-MM-DD
@@ -58,6 +59,16 @@ function JournalScreen() {
   const midnightTimerRef = useRef<NodeJS.Timeout | null>(null);
   const lastOpenDateRef = useRef<string>('');
 
+  // Dev-only helper to test finalization
+  const finalizeTodayNow = useCallback(() => {
+    const todayStr = formatDateLocal(new Date());
+    finalizeDate(todayStr); // will NO-OP if empty
+    // reset local UI to empty to simulate new day
+    setPhysicalHealth(null);
+    setMentalHealth(null);
+    setEntry('');
+  }, []);
+
   // Initialize today's date and load draft
   const initializeToday = useCallback(() => {
     const today = new Date();
@@ -92,20 +103,43 @@ function JournalScreen() {
     }
     
     textDebounceRef.current = setTimeout(() => {
-      saveDraft({
+      const draftData = {
         date: currentDateRef.current,
         text,
-      });
+        physical: physicalHealth,
+        mental: mentalHealth,
+      };
+      
+      // Check if current state has content
+      if (hasContent({ physical: physicalHealth, mental: mentalHealth, text })) {
+        saveDraft(draftData);
+      } else {
+        // Clear empty draft instead of saving
+        clearDraft(currentDateRef.current);
+      }
     }, 500); // 500ms debounce
-  }, []);
+  }, [physicalHealth, mentalHealth]);
 
   // Auto-save ratings immediately
   const saveRating = useCallback((type: 'physical' | 'mental', value: number | null) => {
-    saveDraft({
+    const newPhysical = type === 'physical' ? value : physicalHealth;
+    const newMental = type === 'mental' ? value : mentalHealth;
+    
+    const draftData = {
       date: currentDateRef.current,
-      [type]: value,
-    });
-  }, []);
+      physical: newPhysical,
+      mental: newMental,
+      text: entry,
+    };
+    
+    // Check if current state has content
+    if (hasContent({ physical: newPhysical, mental: newMental, text: entry })) {
+      saveDraft(draftData);
+    } else {
+      // Clear empty draft instead of saving
+      clearDraft(currentDateRef.current);
+    }
+  }, [physicalHealth, mentalHealth, entry]);
 
   // Handle midnight rollover
   const scheduleMidnightRollover = useCallback(() => {
@@ -141,7 +175,13 @@ function JournalScreen() {
       
       // Check if date changed while app was in background
       if (lastOpenDateRef.current && lastOpenDateRef.current !== todayFormatted) {
+        // Finalize previous date (only saves if there was content)
         finalizeDate(lastOpenDateRef.current);
+        // Reset state to empty for new day
+        setPhysicalHealth(null);
+        setMentalHealth(null);
+        setEntry('');
+        // Initialize new day
         initializeToday();
       }
       
@@ -200,9 +240,11 @@ function JournalScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.header}>
-            <Text style={styles.dateText}>
-              {formatDateForDisplay(new Date()).toUpperCase()}
-            </Text>
+            <Pressable onLongPress={__DEV__ ? finalizeTodayNow : undefined}>
+              <Text style={styles.dateText}>
+                {formatDateForDisplay(new Date()).toUpperCase()}
+              </Text>
+            </Pressable>
           </View>
           
           <View style={styles.section}>
