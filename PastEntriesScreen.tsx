@@ -91,6 +91,16 @@ function PastEntriesScreen() {
   const hasDay = hasMonth && day != null;
   const hasValidDate = year != null && month != null && day != null;
 
+  // Auto-size Month button to longest visible month for selected year
+  const monthLongestLabel = useMemo(() => {
+    return monthsForYearSortedDesc
+      .map(m => new Date(2000, m - 1, 1).toLocaleString(undefined, { month: 'long' }))
+      .reduce((a,b) => (b.length > a.length ? b : a), '');
+  }, [monthsForYearSortedDesc]);
+
+  // heuristic width based on label length (approx 8px per char + paddings), clamped:
+  const monthBtnWidth = Math.min(180, Math.max(120, monthLongestLabel.length * 8 + 32));
+
   const selectedEntry: Entry | null = useMemo(() => {
     if (!hasValidDate) return null;
     return (
@@ -116,8 +126,9 @@ function PastEntriesScreen() {
             >
               <Text
                 style={styles.selectorText}
+                numberOfLines={1}
                 adjustsFontSizeToFit
-                minimumFontScale={0.9}
+                minimumFontScale={0.85}   // allow minor shrink for long names
                 allowFontScaling={false}
               >
                 {year == null ? 'Select' : year.toString()}
@@ -128,7 +139,7 @@ function PastEntriesScreen() {
           <View style={styles.selectorCol}>
             <Text style={styles.selectorLabel}>MONTH</Text>
             <Pressable
-              style={styles.selectorBtn}
+              style={[styles.selectorBtn, { maxWidth: monthBtnWidth }]}
               onPress={() => {
                 if (!hasYear) return;
                 setMonthModalVisible(true);
@@ -138,8 +149,9 @@ function PastEntriesScreen() {
             >
               <Text
                 style={styles.selectorText}
+                numberOfLines={1}
                 adjustsFontSizeToFit
-                minimumFontScale={0.9}
+                minimumFontScale={0.85}   // allow minor shrink for long names
                 allowFontScaling={false}
               >
                 {!hasYear ? 'Select' : month == null ? 'Select' : new Date(2000, month - 1, 1).toLocaleString(undefined, { month: 'long' })}
@@ -160,8 +172,9 @@ function PastEntriesScreen() {
             >
               <Text
                 style={styles.selectorText}
+                numberOfLines={1}
                 adjustsFontSizeToFit
-                minimumFontScale={0.9}
+                minimumFontScale={0.85}   // allow minor shrink for long names
                 allowFontScaling={false}
               >
                 {!hasMonth ? 'Select' : day == null ? 'Select' : day.toString()}
@@ -200,12 +213,10 @@ function PastEntriesScreen() {
               <View style={styles.section}>
                 <Text style={styles.entryLabel}>ENTRY</Text>
                 <TextInput
-                  value={(selectedEntry.text ?? '')}
+                  value={selectedEntry?.text ?? ''}   // show box even if empty
                   editable={false}
                   multiline
                   style={styles.entryReadonlyBox}
-                  placeholder=""
-                  placeholderTextColor={COLORS.foreground}
                 />
               </View>
             </>
@@ -272,7 +283,7 @@ const styles = StyleSheet.create({
   },
   headerWrap: {
     width: '100%',
-    maxWidth: 360,
+    maxWidth: 420,       // was 360: give the row more room
     alignSelf: 'center',
   },
   row: {
@@ -280,9 +291,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     paddingHorizontal: 16,
-    gap: 12,
+    columnGap: 12,
     marginTop: 8,
-    marginBottom: 60,
   },
   selectorCol: {
     flex: 1,
@@ -293,30 +303,27 @@ const styles = StyleSheet.create({
     color: COLORS.foreground,
     letterSpacing: 1,
     marginBottom: 8,
-    fontSize: 14,
-    fontWeight: '600',
+    textAlign: 'center',
   },
   selectorBtn: {
-    width: '80%',
-    maxWidth: 140,            // allow a bit wider for "September"
-    height: 40,
-    paddingHorizontal: 10,
-    // IMPORTANT for centering:
-    alignItems: 'center',
-    justifyContent: 'center',
-    // visuals:
-    borderRadius: 10,
+    width: '85%',        // was 80%
+    maxWidth: 160,       // was 120/140: allow wider labels like "September"
+    height: 44,
+    paddingHorizontal: 12,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: COLORS.foreground,
     backgroundColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   selectorText: {
     color: COLORS.foreground,
     fontFamily: 'Alegreya-Regular',
     textAlign: 'center',
-    includeFontPadding: false, // avoids vertical offset on Android
-    // keep single line and shrink a bit for long month names:
-    numberOfLines: 1,
+    includeFontPadding: false, // avoids vertical off-center on Android
+    fontSize: 16,
+    lineHeight: 18,            // closer vertical centering within 44px height
   },
   mainContent: {
     flex: 1,
@@ -326,13 +333,11 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   label: {
-    color: COLORS.foreground,
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 24,
-    letterSpacing: 1.2,
-    textAlign: 'left',
     fontFamily: 'Alegreya-Bold',
+    color: COLORS.foreground,
+    letterSpacing: 1,
+    marginBottom: 8,
+    textAlign: 'center',
   },
   entryLabel: {
     marginTop: 16,
@@ -340,16 +345,19 @@ const styles = StyleSheet.create({
     color: COLORS.foreground,
     fontFamily: 'Alegreya-Bold',
     letterSpacing: 1,
+    textAlign: 'left',
   },
   entryReadonlyBox: {
-    minHeight: 140,
+    alignSelf: 'stretch',         // fill available width
+    width: '100%',                // prevents odd shrink on some layouts
+    minHeight: 160,               // fixed height so empty box has proper shape
     borderWidth: 1,
     borderColor: COLORS.foreground,
-    color: COLORS.foreground,
+    borderRadius: 12,
     backgroundColor: 'transparent',
+    color: COLORS.foreground,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    borderRadius: 12,
     textAlignVertical: 'top',
   },
   noDateSelected: {
