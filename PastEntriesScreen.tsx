@@ -11,8 +11,9 @@ import {
   View,
   Text,
   StyleSheet,
+  Pressable,
 } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import ModalPicker from './src/components/ModalPicker';
 import RatingSelector from './RatingSelector';
 import { Entry, getEntries, seedDummyEntries } from './src/storage/entries';
 import { COLORS } from './src/theme/colors';
@@ -22,6 +23,11 @@ function PastEntriesScreen() {
   const [month, setMonth] = useState<number | null>(null);
   const [day, setDay] = useState<number | null>(null);
   const [entries, setEntries] = useState<Entry[]>([]);
+  
+  // Modal state
+  const [yearModalVisible, setYearModalVisible] = useState(false);
+  const [monthModalVisible, setMonthModalVisible] = useState(false);
+  const [dayModalVisible, setDayModalVisible] = useState(false);
 
   // Seed dummy entries and load entries on mount
   useEffect(() => {
@@ -44,39 +50,45 @@ function PastEntriesScreen() {
     }
   }, [month]);
 
-  // Helper functions to get unique values from entries
-  const getUniqueYears = (): number[] => {
-    const years = entries.map(entry => parseInt(entry.date.split('-')[0]));
-    return [...new Set(years)].sort((a, b) => b - a); // Sort descending
+  type YMD = { y: number; m: number; d: number };
+  const parseYMD = (dateStr: string): YMD => {
+    const [y, m, d] = dateStr.split('-').map(Number);
+    return { y, m, d };
   };
 
-  const getUniqueMonths = (selectedYear: number): number[] => {
-    const months = entries
-      .filter(entry => parseInt(entry.date.split('-')[0]) === selectedYear)
-      .map(entry => parseInt(entry.date.split('-')[1]));
-    return [...new Set(months)].sort((a, b) => a - b); // Sort ascending
-  };
+  // Unique years (DESC)
+  const yearsSortedDesc = useMemo(() => {
+    const s = new Set<number>();
+    entries.forEach(e => s.add(parseYMD(e.date).y));
+    return Array.from(s).sort((a,b) => b - a);
+  }, [entries]);
 
-  const getUniqueDays = (selectedYear: number, selectedMonth: number): number[] => {
-    const days = entries
-      .filter(entry => {
-        const [entryYear, entryMonth] = entry.date.split('-').map(Number);
-        return entryYear === selectedYear && entryMonth === selectedMonth;
-      })
-      .map(entry => parseInt(entry.date.split('-')[2]));
-    return [...new Set(days)].sort((a, b) => a - b); // Sort ascending
-  };
+  // Unique months for selected year (DESC)
+  const monthsForYearSortedDesc = useMemo(() => {
+    if (year == null) return [];
+    const s = new Set<number>();
+    entries.forEach(e => {
+      const { y, m } = parseYMD(e.date);
+      if (y === year) s.add(m);
+    });
+    return Array.from(s).sort((a,b) => b - a);
+  }, [entries, year]);
 
-  // Helper: parse "YYYY-MM-DD"
-  const parseYMD = (dateStr: string): { y: number; m: number; d: number } => {
-    const [ys, ms, ds] = dateStr.split('-');
-    return { y: Number(ys), m: Number(ms), d: Number(ds) };
-  };
+  // Unique days for selected year+month (DESC)
+  const daysForYearMonthSortedDesc = useMemo(() => {
+    if (year == null || month == null) return [];
+    const s = new Set<number>();
+    entries.forEach(e => {
+      const { y, m, d } = parseYMD(e.date);
+      if (y === year && m === month) s.add(d);
+    });
+    return Array.from(s).sort((a,b) => b - a);
+  }, [entries, year, month]);
 
   const hasYear = year != null;
   const hasMonth = hasYear && month != null;
   const hasDay = hasMonth && day != null;
-  const hasValidDate = hasDay;
+  const hasValidDate = year != null && month != null && day != null;
 
   const selectedEntry: Entry | null = useMemo(() => {
     if (!hasValidDate) return null;
@@ -95,52 +107,44 @@ function PastEntriesScreen() {
         <View style={styles.dateSelectors}>
           <View style={styles.pickerContainer}>
             <Text style={styles.dateLabel}>YEAR</Text>
-            <Picker
-              selectedValue={year}
-              onValueChange={(value) => setYear(value)}
-              style={styles.picker}
-              itemStyle={{ color: COLORS.foreground }}
-              dropdownIconColor={COLORS.foreground}
+            <Pressable
+              style={styles.pickerButton}
+              onPress={() => setYearModalVisible(true)}
             >
-              <Picker.Item label="Select Year" value={null} />
-              {getUniqueYears().map(yearOption => (
-                <Picker.Item key={yearOption} label={yearOption.toString()} value={yearOption} />
-              ))}
-            </Picker>
+              <Text style={styles.pickerButtonText}>
+                {year == null ? 'Select' : year.toString()}
+              </Text>
+            </Pressable>
           </View>
 
           <View style={styles.pickerContainer}>
             <Text style={styles.dateLabel}>MONTH</Text>
-            <Picker
-              selectedValue={month}
-              onValueChange={(value) => setMonth(value)}
-              style={styles.picker}
-              itemStyle={{ color: COLORS.foreground }}
-              dropdownIconColor={COLORS.foreground}
-              enabled={hasYear}
+            <Pressable
+              style={[styles.pickerButton, !hasYear && styles.pickerButtonDisabled]}
+              onPress={() => {
+                if (!hasYear) return;
+                setMonthModalVisible(true);
+              }}
             >
-              <Picker.Item label="Select Month" value={null} />
-              {year !== null && getUniqueMonths(year).map(monthOption => (
-                <Picker.Item key={monthOption} label={monthOption.toString()} value={monthOption} />
-              ))}
-            </Picker>
+              <Text style={[styles.pickerButtonText, !hasYear && styles.pickerButtonTextDisabled]}>
+                {!hasYear ? 'Select' : month == null ? 'Select' : new Date(2000, month - 1, 1).toLocaleString(undefined, { month: 'long' })}
+              </Text>
+            </Pressable>
           </View>
 
           <View style={styles.pickerContainer}>
             <Text style={styles.dateLabel}>DAY</Text>
-            <Picker
-              selectedValue={day}
-              onValueChange={(value) => setDay(value)}
-              style={styles.picker}
-              itemStyle={{ color: COLORS.foreground }}
-              dropdownIconColor={COLORS.foreground}
-              enabled={hasMonth}
+            <Pressable
+              style={[styles.pickerButton, !hasMonth && styles.pickerButtonDisabled]}
+              onPress={() => {
+                if (!hasMonth) return;
+                setDayModalVisible(true);
+              }}
             >
-              <Picker.Item label="Select Day" value={null} />
-              {year !== null && month !== null && getUniqueDays(year, month).map(dayOption => (
-                <Picker.Item key={dayOption} label={dayOption.toString()} value={dayOption} />
-              ))}
-            </Picker>
+              <Text style={[styles.pickerButtonText, !hasMonth && styles.pickerButtonTextDisabled]}>
+                {!hasMonth ? 'Select' : day == null ? 'Select' : day.toString()}
+              </Text>
+            </Pressable>
           </View>
         </View>
 
@@ -186,6 +190,46 @@ function PastEntriesScreen() {
           )}
         </View>
       </View>
+
+      {/* Modal Pickers */}
+      <ModalPicker
+        visible={yearModalVisible}
+        title="Select Year"
+        data={yearsSortedDesc}
+        formatItem={(y) => String(y)}
+        onSelect={(selectedYear) => {
+          setYear(selectedYear);
+          setMonth(null);
+          setDay(null);
+        }}
+        onClose={() => setYearModalVisible(false)}
+        testID="year-picker"
+      />
+
+      <ModalPicker
+        visible={monthModalVisible}
+        title="Select Month"
+        data={monthsForYearSortedDesc}
+        formatItem={(m) => new Date(2000, m - 1, 1).toLocaleString(undefined, { month: 'long' })}
+        onSelect={(selectedMonth) => {
+          setMonth(selectedMonth);
+          setDay(null);
+        }}
+        onClose={() => setMonthModalVisible(false)}
+        testID="month-picker"
+      />
+
+      <ModalPicker
+        visible={dayModalVisible}
+        title="Select Day"
+        data={daysForYearMonthSortedDesc}
+        formatItem={(d) => String(d)}
+        onSelect={(selectedDay) => {
+          setDay(selectedDay);
+        }}
+        onClose={() => setDayModalVisible(false)}
+        testID="day-picker"
+      />
     </SafeAreaView>
   );
 }
@@ -218,9 +262,27 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 5,
   },
-  picker: {
-    color: COLORS.foreground,
+  pickerButton: {
     backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: COLORS.foreground,
+    borderRadius: 8,
+    padding: 12,
+    minHeight: 44,
+    justifyContent: 'center',
+  },
+  pickerButtonDisabled: {
+    opacity: 0.5,
+  },
+  pickerButtonText: {
+    color: COLORS.foreground,
+    fontSize: 16,
+    fontFamily: 'Alegreya-Regular',
+    textAlign: 'center',
+  },
+  pickerButtonTextDisabled: {
+    color: COLORS.foreground,
+    opacity: 0.5,
   },
   mainContent: {
     flex: 1,
