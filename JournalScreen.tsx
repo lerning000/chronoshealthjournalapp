@@ -20,7 +20,7 @@ import {
   Pressable,
 } from 'react-native';
 import RatingSelector from './RatingSelector';
-import { getDraft, saveDraft, finalizeDate, clearDraft, hasContent, Draft } from './src/storage/entries';
+import { getDraft, saveDraft, finalizeDate, clearDraft, hasContent, Draft } from '../storage/entries';
 import { COLORS } from './src/theme/colors';
 
 // Helper function to format date as YYYY-MM-DD
@@ -61,9 +61,8 @@ function JournalScreen() {
 
   // Dev-only helper to test finalization
   const finalizeTodayNow = useCallback(() => {
-    const todayStr = formatDateLocal(new Date());
-    finalizeDate(todayStr); // will NO-OP if empty
-    // reset local UI to empty to simulate new day
+    const todayStr = currentDateRef.current;
+    finalizeDate(todayStr); // will only save if there's content
     setPhysicalHealth(null);
     setMentalHealth(null);
     setEntry('');
