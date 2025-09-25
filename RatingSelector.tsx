@@ -5,16 +5,34 @@
 
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
+import { COLORS } from './src/theme/colors';
 
 interface RatingSelectorProps {
-  rating: number; // -1 for unset/null, 0-10 for actual ratings
+  rating: number | null; // null for unset, -1 for unset, 0-10 for actual ratings
   onRatingChange: (rating: number) => void;
+  readOnly?: boolean; // when true, blocks taps and shows static rating
 }
 
-const RatingSelector: React.FC<RatingSelectorProps> = ({ rating, onRatingChange }) => {
+const RatingSelector: React.FC<RatingSelectorProps> = ({ rating, onRatingChange, readOnly = false }) => {
   const renderCircle = (index: number) => {
     // Show filled circles only if rating is set (>= 0) and this index is <= rating
-    const isFilled = rating >= 0 && index <= rating;
+    // Handle both null and -1 as "unset"
+    const numericRating = rating === null ? -1 : rating;
+    const isFilled = numericRating >= 0 && index <= numericRating;
+    
+    const circleElement = (
+      <View
+        key={index}
+        style={[
+          styles.circle,
+          isFilled ? styles.filledCircle : styles.outlinedCircle
+        ]}
+      />
+    );
+    
+    if (readOnly) {
+      return circleElement;
+    }
     
     return (
       <TouchableOpacity
@@ -60,10 +78,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   filledCircle: {
-    backgroundColor: 'white',
+    backgroundColor: COLORS.foreground,
     borderWidth: 2,
-    borderColor: 'white',
-    shadowColor: 'white',
+    borderColor: COLORS.border,
+    shadowColor: COLORS.foreground,
     shadowOffset: {
       width: 0,
       height: 2,

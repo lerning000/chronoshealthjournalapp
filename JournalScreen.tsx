@@ -20,6 +20,7 @@ import {
 } from 'react-native';
 import RatingSelector from './RatingSelector';
 import { getDraft, saveDraft, finalizeDate, Draft } from './src/storage/entries';
+import { COLORS } from './src/theme/colors';
 
 // Helper function to format date as YYYY-MM-DD
 const formatDateLocal = (date: Date): string => {
@@ -189,7 +190,7 @@ function JournalScreen() {
   }, [saveRating]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: COLORS.background }]}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardAvoidingView}
@@ -227,7 +228,7 @@ function JournalScreen() {
               value={entry}
               onChangeText={handleTextChange}
               placeholder="Write your thoughts, experiences, or anything else you'd like to record..."
-              placeholderTextColor="#FFFFFF"
+              placeholderTextColor={COLORS.foreground}
               multiline
               textAlignVertical="top"
             />
@@ -241,7 +242,7 @@ function JournalScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0A0A',
+    backgroundColor: COLORS.background,
   },
   keyboardAvoidingView: {
     flex: 1,
@@ -257,7 +258,7 @@ const styles = StyleSheet.create({
     marginBottom: 60,
   },
   dateText: {
-    color: '#FFFFFF',
+    color: COLORS.foreground,
     fontSize: 28,
     fontWeight: '700',
     textAlign: 'center',
@@ -269,7 +270,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   label: {
-    color: '#FFFFFF',
+    color: COLORS.foreground,
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 24,
@@ -279,14 +280,14 @@ const styles = StyleSheet.create({
   },
   textInput: {
     backgroundColor: 'transparent',
-    color: '#FFFFFF',
+    color: COLORS.foreground,
     fontSize: 16,
     height: 250,
     fontFamily: 'Alegreya-Regular',
     width: '100%',
     lineHeight: 24,
     borderWidth: 1,
-    borderColor: 'white',
+    borderColor: COLORS.border,
     borderRadius: 15,
     padding: 10,
   },

@@ -13,12 +13,25 @@ import {
   StyleSheet,
 } from 'react-native';
 import RatingSelector from './RatingSelector';
+import { COLORS } from './src/theme/colors';
 
 function PastEntriesScreen() {
   const [selectedEntry] = useState(null);
+  const [selectedDate, setSelectedDate] = useState<{
+    year: number | null;
+    month: number | null;
+    day: number | null;
+  }>({
+    year: null,
+    month: null,
+    day: null,
+  });
+
+  // Check if we have a valid date selected
+  const hasValidDate = selectedDate.year !== null && selectedDate.month !== null && selectedDate.day !== null;
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: COLORS.background }]}>
       <View style={styles.content}>
         {/* Date Selectors */}
         <View style={styles.dateSelectors}>
@@ -29,30 +42,40 @@ function PastEntriesScreen() {
 
         {/* Main Content Area */}
         <View style={styles.mainContent}>
-          <View style={styles.section}>
-            <Text style={styles.label}>PHYSICAL HEALTH</Text>
-            <RatingSelector
-              rating={selectedEntry ? selectedEntry.physical : 0}
-              onRatingChange={() => {}} // Read-only for past entries
-            />
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.label}>MENTAL HEALTH</Text>
-            <RatingSelector
-              rating={selectedEntry ? selectedEntry.mental : 0}
-              onRatingChange={() => {}} // Read-only for past entries
-            />
-          </View>
-
-          <View style={styles.section}>
-            <Text style={styles.label}>ENTRY</Text>
-            <View style={styles.entryTextBox}>
-              <Text style={styles.entryText}>
-                {selectedEntry ? selectedEntry.text : ''}
-              </Text>
+          {!hasValidDate ? (
+            <View style={styles.noDateSelected}>
+              <Text style={styles.noDateText}>Select a date to view an entry</Text>
             </View>
-          </View>
+          ) : (
+            <>
+              <View style={styles.section}>
+                <Text style={styles.label}>PHYSICAL HEALTH</Text>
+                <RatingSelector
+                  rating={selectedEntry ? selectedEntry.physical : null}
+                  onRatingChange={() => {}} // Read-only for past entries
+                  readOnly={true}
+                />
+              </View>
+
+              <View style={styles.section}>
+                <Text style={styles.label}>MENTAL HEALTH</Text>
+                <RatingSelector
+                  rating={selectedEntry ? selectedEntry.mental : null}
+                  onRatingChange={() => {}} // Read-only for past entries
+                  readOnly={true}
+                />
+              </View>
+
+              <View style={styles.section}>
+                <Text style={styles.label}>ENTRY</Text>
+                <View style={styles.entryTextBox}>
+                  <Text style={styles.entryText}>
+                    {selectedEntry ? selectedEntry.text : ''}
+                  </Text>
+                </View>
+              </View>
+            </>
+          )}
         </View>
       </View>
     </SafeAreaView>
@@ -62,7 +85,7 @@ function PastEntriesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0A0A',
+    backgroundColor: COLORS.background,
   },
   content: {
     flex: 1,
@@ -76,7 +99,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   dateLabel: {
-    color: '#FFFFFF',
+    color: COLORS.foreground,
     fontSize: 16,
     fontWeight: '600',
     letterSpacing: 1.2,
@@ -90,7 +113,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   label: {
-    color: '#FFFFFF',
+    color: COLORS.foreground,
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 24,
@@ -100,17 +123,29 @@ const styles = StyleSheet.create({
   },
   entryTextBox: {
     borderWidth: 1,
-    borderColor: 'white',
+    borderColor: COLORS.border,
     borderRadius: 15,
     height: 250,
     padding: 10,
     width: '100%',
   },
   entryText: {
-    color: '#FFFFFF',
+    color: COLORS.foreground,
     fontSize: 16,
     lineHeight: 24,
     fontFamily: 'Alegreya-Regular',
+  },
+  noDateSelected: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 60,
+  },
+  noDateText: {
+    color: '#666666',
+    fontSize: 16,
+    fontFamily: 'Alegreya-Regular',
+    textAlign: 'center',
   },
 });
 

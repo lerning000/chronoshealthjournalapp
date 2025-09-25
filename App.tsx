@@ -8,9 +8,10 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { StatusBar, Image } from 'react-native';
+import { StatusBar, Image, View } from 'react-native';
 import JournalScreen from './JournalScreen';
 import PastEntriesScreen from './PastEntriesScreen';
+import { COLORS } from './src/theme/colors';
 
 const journalIcon = require('./assets/icons/journal_icon.png');
 const pastEntriesIcon = require('./assets/icons/past_entries_icon.png');
@@ -19,23 +20,35 @@ const Tab = createBottomTabNavigator();
 
 function App() {
   return (
-    <>
-      <StatusBar barStyle="light-content" backgroundColor="#0A0A0A" />
-      <NavigationContainer>
+    <View style={{ flex: 1, backgroundColor: COLORS.background }}>
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.background} />
+      <NavigationContainer
+        theme={{
+          dark: true,
+          colors: {
+            primary: COLORS.foreground,
+            background: COLORS.background,
+            card: COLORS.background,
+            text: COLORS.foreground,
+            border: COLORS.background,
+            notification: COLORS.foreground,
+          },
+        }}
+      >
         <Tab.Navigator
           screenOptions={{
             headerShown: false,
             tabBarStyle: {
-              backgroundColor: '#0A0A0A',
-              borderTopColor: '#333333',
-              borderTopWidth: 1,
+              backgroundColor: COLORS.background,
+              borderTopColor: COLORS.background,
+              borderTopWidth: 0,
               height: 60,
               paddingBottom: 8,
               paddingTop: 8,
               bottom: 35,
             },
-            tabBarActiveTintColor: '#FFFFFF',
-            tabBarInactiveTintColor: '#888888',
+            tabBarActiveTintColor: COLORS.foreground,
+            tabBarInactiveTintColor: '#666666',
             tabBarLabelStyle: {
               fontSize: 12,
               fontWeight: '600',
@@ -43,18 +56,21 @@ function App() {
               letterSpacing: 0.5,
             },
             headerStyle: {
-              backgroundColor: '#0A0A0A',
-              borderBottomColor: '#333333',
-              borderBottomWidth: 1,
+              backgroundColor: COLORS.background,
+              borderBottomColor: COLORS.background,
+              borderBottomWidth: 0,
             },
             headerTitleStyle: {
-              color: '#FFFFFF',
+              color: COLORS.foreground,
               fontSize: 18,
               fontWeight: '700',
               fontFamily: 'Alegreya-Bold',
               letterSpacing: 0.3,
             },
-            headerTintColor: '#FFFFFF',
+            headerTintColor: COLORS.foreground,
+            sceneContainerStyle: {
+              backgroundColor: COLORS.background,
+            },
           }}
         >
           <Tab.Screen
@@ -89,7 +105,7 @@ function App() {
           />
         </Tab.Navigator>
       </NavigationContainer>
-    </>
+    </View>
   );
 }
 
