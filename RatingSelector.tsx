@@ -16,10 +16,9 @@ interface RatingSelectorProps {
 
 const RatingSelector: React.FC<RatingSelectorProps> = ({ value, onChange, readOnly = false, color }) => {
   const renderCircle = (index: number) => {
-    // Show filled circles only if value is set (>= 0) and this index is <= value
-    // Handle both null and -1 as "unset"
-    const numericValue = value === null ? -1 : value;
-    const isFilled = numericValue >= 0 && index <= numericValue;
+    // Show filled circles only if value is set (1-10) and this index is <= value
+    // When value is null, show all circles unfilled
+    const isFilled = value !== null && index <= value;
     
     const circleElement = (
       <View
@@ -54,7 +53,7 @@ const RatingSelector: React.FC<RatingSelectorProps> = ({ value, onChange, readOn
   return (
     <View style={styles.container}>
       <View style={styles.ratingContainer}>
-        {Array.from({ length: 11 }, (_, index) => renderCircle(index))}
+        {Array.from({ length: 10 }, (_, index) => renderCircle(index + 1))}
       </View>
     </View>
   );
