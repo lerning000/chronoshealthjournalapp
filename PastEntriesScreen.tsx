@@ -73,7 +73,10 @@ function PastEntriesScreen() {
     return { y: Number(ys), m: Number(ms), d: Number(ds) };
   };
 
-  const hasValidDate = year != null && month != null && day != null;
+  const hasYear = year != null;
+  const hasMonth = hasYear && month != null;
+  const hasDay = hasMonth && day != null;
+  const hasValidDate = hasDay;
 
   const selectedEntry: Entry | null = useMemo(() => {
     if (!hasValidDate) return null;
@@ -114,7 +117,7 @@ function PastEntriesScreen() {
               style={styles.picker}
               itemStyle={{ color: COLORS.foreground }}
               dropdownIconColor={COLORS.foreground}
-              enabled={year !== null}
+              enabled={hasYear}
             >
               <Picker.Item label="Select Month" value={null} />
               {year !== null && getUniqueMonths(year).map(monthOption => (
@@ -131,7 +134,7 @@ function PastEntriesScreen() {
               style={styles.picker}
               itemStyle={{ color: COLORS.foreground }}
               dropdownIconColor={COLORS.foreground}
-              enabled={year !== null && month !== null}
+              enabled={hasMonth}
             >
               <Picker.Item label="Select Day" value={null} />
               {year !== null && month !== null && getUniqueDays(year, month).map(dayOption => (
@@ -143,27 +146,11 @@ function PastEntriesScreen() {
 
         {/* Main Content Area */}
         <View style={styles.mainContent}>
-          {selectedEntry === null ? (
+          {!hasValidDate ? (
             <View style={styles.noDateSelected}>
-              <Text style={styles.noDateText}>Select a year, month, and day to view an entry.</Text>
-              <View style={styles.section}>
-                <Text style={styles.label}>PHYSICAL HEALTH</Text>
-                <RatingSelector
-                  value={null}
-                  readOnly
-                  color={COLORS.foreground}
-                />
-              </View>
-              <View style={styles.section}>
-                <Text style={styles.label}>MENTAL HEALTH</Text>
-                <RatingSelector
-                  value={null}
-                  readOnly
-                  color={COLORS.foreground}
-                />
-              </View>
+              <Text style={styles.noDateText}>Select Year → Month → Day to view an entry.</Text>
             </View>
-          ) : (
+          ) : selectedEntry ? (
             <>
               <View style={styles.section}>
                 <Text style={styles.label}>PHYSICAL HEALTH</Text>
@@ -192,6 +179,10 @@ function PastEntriesScreen() {
                 </View>
               </View>
             </>
+          ) : (
+            <View style={styles.noDateSelected}>
+              <Text style={styles.noDateText}>No entry for this date.</Text>
+            </View>
           )}
         </View>
       </View>
@@ -248,8 +239,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Alegreya-Bold',
   },
   entryTextBox: {
-    borderWidth: 1,
-    borderColor: COLORS.border,
+    borderWidth: 0,
+    borderColor: 'transparent',
     borderRadius: 15,
     height: 250,
     padding: 10,
