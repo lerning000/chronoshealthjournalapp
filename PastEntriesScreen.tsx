@@ -5,19 +5,21 @@
  * @format
  */
 
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import {
-  SafeAreaView,
+  ScrollView,
   View,
   Text,
   TextInput,
-  StyleSheet,
   Pressable,
+  SafeAreaView,
+  StyleSheet,
 } from 'react-native';
 import ModalPicker from './src/components/ModalPicker';
 import RatingSelector from './RatingSelector';
 import { Entry, getEntries, seedDummyEntries } from './src/storage/entries';
 import { COLORS } from './src/theme/colors';
+import { SIZES } from './src/theme/sizes';
 
 function PastEntriesScreen() {
   const [year, setYear] = useState<number | null>(null);
@@ -52,17 +54,17 @@ function PastEntriesScreen() {
   }, [month]);
 
   type YMD = { y: number; m: number; d: number };
-  const parseYMD = (dateStr: string): YMD => {
+  const parseYMD = useCallback((dateStr: string): YMD => {
     const [y, m, d] = dateStr.split('-').map(Number);
     return { y, m, d };
-  };
+  }, []);
 
   // Unique years (DESC)
   const yearsSortedDesc = useMemo(() => {
     const s = new Set<number>();
     entries.forEach(e => s.add(parseYMD(e.date).y));
     return Array.from(s).sort((a,b) => b - a);
-  }, [entries]);
+  }, [entries, parseYMD]);
 
   // Unique months for selected year (DESC)
   const monthsForYearSortedDesc = useMemo(() => {
@@ -73,7 +75,7 @@ function PastEntriesScreen() {
       if (y === year) s.add(m);
     });
     return Array.from(s).sort((a,b) => b - a);
-  }, [entries, year]);
+  }, [entries, year, parseYMD]);
 
   // Unique days for selected year+month (DESC)
   const daysForYearMonthSortedDesc = useMemo(() => {
@@ -84,11 +86,10 @@ function PastEntriesScreen() {
       if (y === year && m === month) s.add(d);
     });
     return Array.from(s).sort((a,b) => b - a);
-  }, [entries, year, month]);
+  }, [entries, year, month, parseYMD]);
 
   const hasYear = year != null;
   const hasMonth = hasYear && month != null;
-  const hasDay = hasMonth && day != null;
   const hasValidDate = year != null && month != null && day != null;
 
   // Auto-size Month button to longest visible month for selected year
@@ -109,11 +110,15 @@ function PastEntriesScreen() {
         return y === year && m === month && d === day;
       }) ?? null
     );
-  }, [entries, year, month, day, hasValidDate]);
+  }, [entries, year, month, day, hasValidDate, parseYMD]);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: COLORS.background }]}>
-      <View style={styles.content}>
+      <ScrollView
+        style={{ flex: 1, backgroundColor: COLORS.background }}
+        contentContainerStyle={{ paddingBottom: SIZES.pageBottomPad }}
+        keyboardShouldPersistTaps="handled"
+      >
         {/* Date Selectors */}
         <View style={styles.headerWrap}>
           <View style={styles.row}>
@@ -185,7 +190,7 @@ function PastEntriesScreen() {
         </View>
 
         {/* Main Content Area */}
-        <View style={styles.mainContent}>
+        <View style={styles.contentWrap}>
           {!hasValidDate ? (
             <View style={styles.noDateSelected}>
               <Text style={styles.noDateText}>Select Year → Month → Day to view an entry.</Text>
@@ -193,7 +198,7 @@ function PastEntriesScreen() {
           ) : selectedEntry ? (
             <>
               <View style={styles.section}>
-                <Text style={styles.label}>PHYSICAL HEALTH</Text>
+                <Text style={styles.ratingLabel}>PHYSICAL HEALTH</Text>
                 <RatingSelector
                   value={selectedEntry.physical ?? null}
                   readOnly
@@ -202,7 +207,7 @@ function PastEntriesScreen() {
               </View>
 
               <View style={styles.section}>
-                <Text style={styles.label}>MENTAL HEALTH</Text>
+                <Text style={styles.ratingLabel}>MENTAL HEALTH</Text>
                 <RatingSelector
                   value={selectedEntry.mental ?? null}
                   readOnly
@@ -211,9 +216,9 @@ function PastEntriesScreen() {
               </View>
 
               <View style={styles.section}>
-                <Text style={styles.entryLabel}>ENTRY</Text>
+                <Text style={styles.ratingLabel}>ENTRY</Text>
                 <TextInput
-                  value={selectedEntry?.text ?? ''}   // show box even if empty
+                  value={selectedEntry?.text ?? ''}
                   editable={false}
                   multiline
                   style={styles.entryReadonlyBox}
@@ -226,7 +231,7 @@ function PastEntriesScreen() {
             </View>
           )}
         </View>
-      </View>
+      </ScrollView>
 
       {/* Modal Pickers */}
       <ModalPicker
@@ -276,23 +281,27 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
-  content: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingTop: 40,
-  },
   headerWrap: {
     width: '100%',
-    maxWidth: 420,       // was 360: give the row more room
+    maxWidth: SIZES.headerMaxWidth,
     alignSelf: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 40,
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     paddingHorizontal: 16,
-    columnGap: 12,
+    columnGap: SIZES.headerGap,
     marginTop: 8,
+  },
+  contentWrap: {
+    width: '100%',
+    maxWidth: SIZES.headerMaxWidth,
+    alignSelf: 'center',
+    paddingHorizontal: 16,
+    marginTop: SIZES.sectionGap,  // breathing room below selectors
   },
   selectorCol: {
     flex: 1,
@@ -325,12 +334,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 18,            // closer vertical centering within 44px height
   },
-  mainContent: {
-    flex: 1,
+  section: { 
+    marginTop: SIZES.sectionGap 
   },
-  section: {
-    marginBottom: 50,
-    alignItems: 'flex-start',
+  ratingLabel: {
+    color: COLORS.foreground,
+    fontFamily: 'Alegreya-Bold',
+    letterSpacing: 1,
+    marginBottom: 8,            // a touch more separation from dots/box
   },
   label: {
     fontFamily: 'Alegreya-Bold',
@@ -348,9 +359,7 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
   entryReadonlyBox: {
-    alignSelf: 'stretch',         // fill available width
-    width: '100%',                // prevents odd shrink on some layouts
-    minHeight: 160,               // fixed height so empty box has proper shape
+    height: SIZES.entryBoxHeight,  // fixed to match Journal
     borderWidth: 1,
     borderColor: COLORS.foreground,
     borderRadius: 12,

@@ -22,6 +22,7 @@ import {
 import RatingSelector from './RatingSelector';
 import { getDraft, saveDraft, finalizeDate, clearDraft, hasContent, Draft } from './src/storage/entries';
 import { COLORS } from './src/theme/colors';
+import { SIZES } from './src/theme/sizes';
 
 // Helper function to format date as YYYY-MM-DD
 const formatDateLocal = (date: Date): string => {
@@ -265,7 +266,7 @@ function JournalScreen() {
           <View style={styles.section}>
             <Text style={styles.label}>ENTRY</Text>
             <TextInput
-              style={styles.textInput}
+              style={styles.entryBox}
               value={entry}
               onChangeText={handleTextChange}
               multiline
@@ -290,7 +291,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: 20,
     paddingTop: 40,
-    paddingBottom: 40,
+    paddingBottom: SIZES.pageBottomPad,
   },
   header: {
     alignItems: 'center',
@@ -304,31 +305,25 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
     fontFamily: 'Alegreya-Bold',
   },
-  section: {
-    marginBottom: 50,
-    alignItems: 'flex-start',
+  section: { 
+    marginTop: SIZES.sectionGap 
   },
   label: {
     color: COLORS.foreground,
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 24,
-    letterSpacing: 1.2,
     fontFamily: 'Alegreya-Bold',
-    textAlign: 'left',
+    letterSpacing: 1,
+    marginBottom: 8,            // a touch more separation from dots/box
   },
-  textInput: {
+  entryBox: {
+    height: SIZES.entryBoxHeight,   // use the shared height
+    borderWidth: 1,
+    borderColor: COLORS.foreground,
+    borderRadius: 12,
     backgroundColor: 'transparent',
     color: COLORS.foreground,
-    fontSize: 16,
-    height: 250,
-    fontFamily: 'Alegreya-Regular',
-    width: '100%',
-    lineHeight: 24,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    borderRadius: 15,
-    padding: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    textAlignVertical: 'top',
   },
 });
 
