@@ -1,101 +1,100 @@
-# Applied Fixes Summary
+# Fixes Applied & Recovery Steps
 
-## A) Past Entries → No Filled Dots Until Valid Date Selected ✅
+## Terminal Recovery Steps
 
-### Changes Made:
-- **PastEntriesScreen.tsx**:
-  - Added `selectedDate` state with `year`, `month`, `day` all starting as `null`
-  - Added `hasValidDate` check to determine if a complete date is selected
-  - Only render entry view (ratings + text) when `hasValidDate` is true
-  - Show "Select a date to view an entry" message when no date selected
-  - Pass `null` to RatingSelector when no entry exists (shows empty circles)
-  - Added `readOnly={true}` prop to RatingSelector for past entries
+### Quick Recovery (Most Common Issues)
 
-- **RatingSelector.tsx**:
-  - Updated interface to accept `rating: number | null` and `readOnly?: boolean`
-  - Added logic to handle `null` values (treats as unset)
-  - When `readOnly` is true, renders static `View` instead of `TouchableOpacity`
-  - When `readOnly` is true and `rating` is null, shows all empty circles
-  - When `readOnly` is true and `rating` is a number, shows filled up to that value
+1. **Close Simulator** - Kill any running iOS Simulator instances
+2. **Run restart script:**
+   ```bash
+   npm run restart
+   ```
+   Or for alternative port:
+   ```bash
+   npm run restart:8082
+   npm run ios:8082
+   ```
+3. **If Cursor terminal is unresponsive:** 
+   - Cursor → Help → Reload Window
+4. **If iOS build errors about pods:**
+   ```bash
+   npx pod-install ios
+   ```
+   Then restart with `npm run restart`
 
-### Result:
-- Past Entries screen shows empty rating rows until a valid date is selected
-- No filled dots appear by default
-- Clear visual indication that date selection is required
+### Available Scripts
 
-## B) Journal Entry → No Dummy Text ✅
+- `npm run restart` - Standard Metro restart (port 8081)
+- `npm run restart:8082` - Restart Metro on port 8082
+- `npm run ios:8082` - Run iOS app with port 8082
+- `npm run doctor` - Check environment versions
 
-### Changes Made:
-- **JournalScreen.tsx**:
-  - Verified `entry` state starts as empty string `''`
-  - Confirmed draft loading uses `draft.text ?? ''` (empty fallback)
-  - Placeholder text is appropriate and not dummy content
-  - No hardcoded sample text found
+### What the Restart Scripts Do
 
-### Result:
-- Journal Entry field starts completely empty on new day
-- Only loads actual draft content when available
-- No dummy or sample text present
+- Kill processes on port 8081 safely
+- Clear watchman cache
+- Remove Metro temp files
+- Reset Metro cache
+- Start fresh Metro bundler
 
-## C) Remove White Strip → Full Black Background ✅
+### Environment Check
 
-### Changes Made:
-- **App.tsx**:
-  - Wrapped root in `View` with `backgroundColor: '#000000'`
-  - Updated `StatusBar` to use `backgroundColor: '#000000'`
-  - Added `NavigationContainer` theme with dark colors and black background
-  - Updated `Tab.Navigator` `screenOptions`:
-    - `tabBarStyle`: `backgroundColor: '#000000'`, `borderTopColor: '#000000'`, `borderTopWidth: 0`
-    - `tabBarInactiveTintColor: '#9CA3AF'` (gray instead of white for inactive)
-    - `sceneContainerStyle: { backgroundColor: '#000000' }`
-    - `headerStyle`: `backgroundColor: '#000000'`, `borderBottomColor: '#000000'`
+Run `npm run doctor` to verify:
+- Node.js version
+- npm version  
+- Watchman version
+- Xcode version
 
-- **JournalScreen.tsx**:
-  - Updated `SafeAreaView` style to use `backgroundColor: '#000000'`
-  - Updated container style to use `backgroundColor: '#000000'`
+## Layout & Styling Fixes Applied
 
-- **PastEntriesScreen.tsx**:
-  - Updated `SafeAreaView` style to use `backgroundColor: '#000000'`
-  - Updated container style to use `backgroundColor: '#000000'`
+### Shared Sizing Constants (`src/theme/sizes.ts`)
+- `entryBoxHeight: 240` - Consistent entry box height
+- `headerMaxWidth: 420` - Max width for header sections
+- `headerGap: 12` - Horizontal gap between header elements
+- `sectionGap: 24` - Vertical spacing between sections
+- `pageBottomPad: 36` - Bottom padding for ScrollViews
 
-### Result:
-- Entire app background is now pure black (`#000000`)
-- Tab bar is black with no white borders
-- Safe areas (home indicator area) are black
-- No white strips visible anywhere
+### Visual Polish Applied
+- Label spacing: `marginBottom: 8` (was 6px) for better separation
+- Consistent styling across Journal and Past Entries screens
+- Responsive layout with proper max-width constraints
+- Professional spacing and typography
 
-## D) Code Hygiene ✅
+### ScrollView Improvements
+- Proper `contentContainerStyle` with bottom padding
+- `keyboardShouldPersistTaps="handled"` for better UX
+- Fixed height entry boxes to prevent compression
+- Vertical column layout without horizontal compression
 
-### Type Safety:
-- Maintained strict TypeScript typing
-- Properly handled `null` values for ratings
-- Added `readOnly` boolean prop with proper typing
+## Storage & Data Management
 
-### Dependencies:
-- No new dependencies added
-- Used existing React Native components only
+### Content Detection
+- `hasContent()` helper prevents saving empty entries
+- `finalizeDate()` only saves entries with meaningful content
+- Auto-save with debouncing for text input
+- Midnight rollover with proper state management
 
-### Styling:
-- Preserved existing Alegreya font usage
-- Maintained white text on black background theme
-- Consistent color scheme throughout
+### Development Features
+- `seedDummyEntries()` for testing Past Entries functionality
+- `finalizeTodayNow()` dev-only helper for testing finalization
+- Long-press on date title triggers finalization (dev only)
 
-## Testing Scenarios Satisfied
+## File Structure
 
-### ✅ Past Entries Empty State:
-- Launch app → go to Past Entries → all rating rows appear **empty** (no filled dots)
-- Shows "Select a date to view an entry" message
-- Only displays entry content when valid date is selected
+```
+src/
+├── theme/
+│   ├── colors.ts
+│   └── sizes.ts
+├── storage/
+│   └── entries.ts
+└── components/
+    └── ModalPicker.tsx
+```
 
-### ✅ Journal Empty Start:
-- Journal Entry text box is **empty** on new day
-- No dummy or placeholder content
-- Only loads actual draft text when available
+## Notes
 
-### ✅ Full Black Background:
-- Bottom white strip is completely gone
-- Tab bar is black with no borders
-- Safe areas (home indicator) are black
-- Entire app background is pure black
-
-All fixes have been successfully applied and tested for linting errors. The app now provides a clean, consistent black background experience with proper empty states and no unwanted visual elements.
+- All storage imports use `./src/storage/entries` path
+- Shared constants ensure consistent styling across screens
+- Proper error handling and graceful failures in scripts
+- macOS-optimized bash commands for development workflow

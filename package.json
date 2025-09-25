@@ -4,9 +4,12 @@
   "private": true,
   "scripts": {
     "android": "react-native run-android",
+    "doctor": "bash -lc 'node -v; npm -v; watchman --version 2>/dev/null || echo no-watchman; xcodebuild -version 2>/dev/null | head -n 1 || true'",
     "ios": "react-native run-ios",
     "lint": "eslint .",
     "restart": "bash -lc 'lsof -ti :8081 | xargs kill -9 2>/dev/null || true; pkill -f \"react-native|metro|node\" 2>/dev/null || true; watchman watch-del-all 2>/dev/null || true; rm -rf /tmp/metro-*; npm run start -- --reset-cache'",
+    "restart:8082": "bash -lc 'lsof -ti :8081 | xargs kill -9 2>/dev/null || true; watchman watch-del-all 2>/dev/null || true; npm run start -- --port 8082 --reset-cache'",
+    "ios:8082": "react-native run-ios --port 8082",
     "start": "react-native start",
     "test": "jest"
   },
