@@ -34,7 +34,9 @@ function PastEntriesScreen() {
 
   // Seed dummy entries and load entries on mount
   useEffect(() => {
-    seedDummyEntries();
+    if (__DEV__) {
+      seedDummyEntries();
+    }
     setEntries(getEntries());
   }, []);
 

@@ -62,11 +62,13 @@ function JournalScreen() {
 
   // Dev-only helper to test finalization
   const finalizeTodayNow = useCallback(() => {
-    const todayStr = currentDateRef.current;
-    finalizeDate(todayStr); // will only save if there's content
-    setPhysicalHealth(null);
-    setMentalHealth(null);
-    setEntry('');
+    if (__DEV__) {
+      const todayStr = currentDateRef.current;
+      finalizeDate(todayStr); // will only save if there's content
+      setPhysicalHealth(null);
+      setMentalHealth(null);
+      setEntry('');
+    }
   }, []);
 
   // Initialize today's date and load draft
