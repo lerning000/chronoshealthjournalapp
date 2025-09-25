@@ -5,7 +5,7 @@
  * @format
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   View,
@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import RatingSelector from './RatingSelector';
 import { COLORS } from './src/theme/colors';
+import { seedDummyEntries } from './src/storage/entries';
 
 function PastEntriesScreen() {
   const [selectedEntry] = useState(null);
@@ -26,6 +27,11 @@ function PastEntriesScreen() {
     month: null,
     day: null,
   });
+
+  // Seed dummy entries on mount
+  useEffect(() => {
+    seedDummyEntries();
+  }, []);
 
   // Check if we have a valid date selected
   const hasValidDate = selectedDate.year !== null && selectedDate.month !== null && selectedDate.day !== null;

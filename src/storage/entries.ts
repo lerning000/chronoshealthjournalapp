@@ -210,3 +210,43 @@ export function finalizeDate(date: string): void {
     console.error('Error finalizing date:', error);
   }
 }
+
+/**
+ * Seed dummy entries for testing if they don't already exist
+ */
+export function seedDummyEntries(): void {
+  try {
+    // Check if dummy entries already exist
+    const existingEntries = getAllEntriesFromStorage();
+    const hasAug3Entry = existingEntries.some(entry => entry.date === '2024-08-03');
+    const hasSep7Entry = existingEntries.some(entry => entry.date === '2023-09-07');
+    
+    // Create dummy entry for 2024-08-03
+    if (!hasAug3Entry) {
+      const aug3Entry: Entry = {
+        id: '2024-08-03-dummy',
+        date: '2024-08-03',
+        physical: 7,
+        mental: 5,
+        text: 'Dummy entry for August 3rd, 2024',
+        updatedAt: Date.now(),
+      };
+      upsertEntry(aug3Entry);
+    }
+    
+    // Create dummy entry for 2023-09-07
+    if (!hasSep7Entry) {
+      const sep7Entry: Entry = {
+        id: '2023-09-07-dummy',
+        date: '2023-09-07',
+        physical: 3,
+        mental: 8,
+        text: 'Dummy entry for September 7th, 2023',
+        updatedAt: Date.now(),
+      };
+      upsertEntry(sep7Entry);
+    }
+  } catch (error) {
+    console.error('Error seeding dummy entries:', error);
+  }
+}
