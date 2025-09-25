@@ -10,6 +10,7 @@ import {
   SafeAreaView,
   View,
   Text,
+  TextInput,
   StyleSheet,
   Pressable,
 } from 'react-native';
@@ -113,7 +114,12 @@ function PastEntriesScreen() {
               onPress={() => setYearModalVisible(true)}
               testID="year-btn"
             >
-              <Text style={styles.selectorText}>
+              <Text
+                style={styles.selectorText}
+                adjustsFontSizeToFit
+                minimumFontScale={0.9}
+                allowFontScaling={false}
+              >
                 {year == null ? 'Select' : year.toString()}
               </Text>
             </Pressable>
@@ -130,7 +136,12 @@ function PastEntriesScreen() {
               disabled={!hasYear}
               testID="month-btn"
             >
-              <Text style={styles.selectorText}>
+              <Text
+                style={styles.selectorText}
+                adjustsFontSizeToFit
+                minimumFontScale={0.9}
+                allowFontScaling={false}
+              >
                 {!hasYear ? 'Select' : month == null ? 'Select' : new Date(2000, month - 1, 1).toLocaleString(undefined, { month: 'long' })}
               </Text>
             </Pressable>
@@ -147,7 +158,12 @@ function PastEntriesScreen() {
               disabled={!hasMonth}
               testID="day-btn"
             >
-              <Text style={styles.selectorText}>
+              <Text
+                style={styles.selectorText}
+                adjustsFontSizeToFit
+                minimumFontScale={0.9}
+                allowFontScaling={false}
+              >
                 {!hasMonth ? 'Select' : day == null ? 'Select' : day.toString()}
               </Text>
             </Pressable>
@@ -182,12 +198,15 @@ function PastEntriesScreen() {
               </View>
 
               <View style={styles.section}>
-                <Text style={styles.label}>ENTRY</Text>
-                <View style={styles.entryTextBox}>
-                  <Text style={styles.entryText}>
-                    {selectedEntry.text}
-                  </Text>
-                </View>
+                <Text style={styles.entryLabel}>ENTRY</Text>
+                <TextInput
+                  value={(selectedEntry.text ?? '')}
+                  editable={false}
+                  multiline
+                  style={styles.entryReadonlyBox}
+                  placeholder=""
+                  placeholderTextColor={COLORS.foreground}
+                />
               </View>
             </>
           ) : (
@@ -279,23 +298,25 @@ const styles = StyleSheet.create({
   },
   selectorBtn: {
     width: '80%',
-    maxWidth: 120,
+    maxWidth: 140,            // allow a bit wider for "September"
     height: 40,
     paddingHorizontal: 10,
+    // IMPORTANT for centering:
+    alignItems: 'center',
+    justifyContent: 'center',
+    // visuals:
     borderRadius: 10,
     borderWidth: 1,
     borderColor: COLORS.foreground,
     backgroundColor: 'transparent',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   selectorText: {
     color: COLORS.foreground,
     fontFamily: 'Alegreya-Regular',
-    includeFontPadding: false,
-    textAlignVertical: 'center',
+    textAlign: 'center',
+    includeFontPadding: false, // avoids vertical offset on Android
+    // keep single line and shrink a bit for long month names:
     numberOfLines: 1,
-    fontSize: 14,
   },
   mainContent: {
     flex: 1,
@@ -313,19 +334,23 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     fontFamily: 'Alegreya-Bold',
   },
-  entryTextBox: {
-    borderWidth: 0,
-    borderColor: 'transparent',
-    borderRadius: 15,
-    height: 250,
-    padding: 10,
-    width: '100%',
-  },
-  entryText: {
+  entryLabel: {
+    marginTop: 16,
+    marginBottom: 6,
     color: COLORS.foreground,
-    fontSize: 16,
-    lineHeight: 24,
-    fontFamily: 'Alegreya-Regular',
+    fontFamily: 'Alegreya-Bold',
+    letterSpacing: 1,
+  },
+  entryReadonlyBox: {
+    minHeight: 140,
+    borderWidth: 1,
+    borderColor: COLORS.foreground,
+    color: COLORS.foreground,
+    backgroundColor: 'transparent',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 12,
+    textAlignVertical: 'top',
   },
   noDateSelected: {
     flex: 1,
