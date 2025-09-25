@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
   entryReadonlyBox: {
-    height: SIZES.entryBoxHeight,  // fixed to match Journal
+    height: SIZES.entryBoxHeight,
     borderWidth: 1,
     borderColor: COLORS.foreground,
     borderRadius: 12,
@@ -368,6 +368,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     textAlignVertical: 'top',
+    fontFamily: 'Alegreya-Regular',   // <-- new line
+    fontSize: 16,
   },
   noDateSelected: {
     flex: 1,

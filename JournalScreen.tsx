@@ -324,6 +324,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
     textAlignVertical: 'top',
+    fontFamily: 'Alegreya-Regular',   // <-- new line
+    fontSize: 16,                     // optional: keep consistent with rest
   },
 });
 
