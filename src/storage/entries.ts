@@ -15,7 +15,9 @@ function getAllEntriesFromStorage(): Entry[] {
     }
     return JSON.parse(entriesJson);
   } catch (error) {
-    console.error('Error parsing entries from storage:', error);
+    if (__DEV__) {
+      console.error('Error parsing entries from storage:', error);
+    }
     return [];
   }
 }
@@ -25,7 +27,9 @@ function saveAllEntriesToStorage(entries: Entry[]): void {
   try {
     storage.set(ENTRIES_KEY, JSON.stringify(entries));
   } catch (error) {
-    console.error('Error saving entries to storage:', error);
+    if (__DEV__) {
+      console.error('Error saving entries to storage:', error);
+    }
   }
 }
 
@@ -132,7 +136,9 @@ export function getDraft(date: string): Draft | null {
     }
     return JSON.parse(draftJson);
   } catch (error) {
-    console.error('Error getting draft:', error);
+    if (__DEV__) {
+      console.error('Error getting draft:', error);
+    }
     return null;
   }
 }
@@ -160,7 +166,9 @@ export function saveDraft(partial: Partial<Draft> & { date: string }): void {
     // Save back to storage
     storage.set(draftKey, JSON.stringify(mergedDraft));
   } catch (error) {
-    console.error('Error saving draft:', error);
+    if (__DEV__) {
+      console.error('Error saving draft:', error);
+    }
   }
 }
 
@@ -173,7 +181,9 @@ export function clearDraft(date: string): void {
     const draftKey = `draft:${date}`;
     storage.delete(draftKey);
   } catch (error) {
-    console.error('Error clearing draft:', error);
+    if (__DEV__) {
+      console.error('Error clearing draft:', error);
+    }
   }
 }
 
@@ -214,7 +224,9 @@ export function finalizeDate(date: string): void {
     // Clear the draft
     clearDraft(date);
   } catch (error) {
-    console.error('Error finalizing date:', error);
+    if (__DEV__) {
+      console.error('Error finalizing date:', error);
+    }
   }
 }
 
@@ -254,7 +266,9 @@ export function seedDummyEntries(): void {
       upsertEntry(sep7Entry);
     }
   } catch (error) {
-    console.error('Error seeding dummy entries:', error);
+    if (__DEV__) {
+      console.error('Error seeding dummy entries:', error);
+    }
   }
 }
 

@@ -8,13 +8,18 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { StatusBar, Image, View } from 'react-native';
+import { StatusBar, Image, View, LogBox } from 'react-native';
 import JournalScreen from './JournalScreen';
 import PastEntriesScreen from './PastEntriesScreen';
 import { COLORS } from './src/theme/colors';
 
 const journalIcon = require('./assets/icons/journal_icon.png');
 const pastEntriesIcon = require('./assets/icons/past_entries_icon.png');
+
+// Configure LogBox for development only
+if (__DEV__) {
+  LogBox.ignoreAllLogs(false); // show warnings in dev
+}
 
 const Tab = createBottomTabNavigator();
 
