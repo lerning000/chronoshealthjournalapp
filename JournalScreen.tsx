@@ -61,15 +61,16 @@ function JournalScreen() {
   const lastOpenDateRef = useRef<string>('');
 
   // Dev-only helper to test finalization
-  const finalizeTodayNow = useCallback(() => {
-    if (__DEV__) {
+  let finalizeTodayNow: (() => void) | undefined;
+  if (__DEV__) {
+    finalizeTodayNow = useCallback(() => {
       const todayStr = currentDateRef.current;
       finalizeDate(todayStr); // will only save if there's content
       setPhysicalHealth(null);
       setMentalHealth(null);
       setEntry('');
-    }
-  }, []);
+    }, []);
+  }
 
   // Initialize today's date and load draft
   const initializeToday = useCallback(() => {
@@ -243,9 +244,7 @@ function JournalScreen() {
         >
           <View style={styles.header}>
             <Pressable onLongPress={__DEV__ ? finalizeTodayNow : undefined}>
-              <Text style={styles.dateText}>
-                {formatDateForDisplay(new Date()).toUpperCase()}
-              </Text>
+              <Text style={styles.dateText}>{formatDateForDisplay(new Date()).toUpperCase()}</Text>
             </Pressable>
           </View>
           
