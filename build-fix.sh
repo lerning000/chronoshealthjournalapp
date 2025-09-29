@@ -19,20 +19,14 @@ cd ..
 echo "3. Installing Node dependencies with npm..."
 npm install
 
-# 4. Apply Execute Permissions (the fix for EPERM errors)
-# This step MUST run AFTER npm install
-REACT_NATIVE_SH_PATH="node_modules/react-native/scripts/react-native.sh"
-if [ -f "$REACT_NATIVE_SH_PATH" ]; then
-    echo "4. Granting execute permission to $REACT_NATIVE_SH_PATH"
-    chmod +x "$REACT_NATIVE_SH_PATH"
-else
-    echo "ERROR: React Native script not found at $REACT_NATIVE_SH_PATH after npm install."
-    exit 1
-fi
+# 4. Cleanup complete - dependencies installed
+echo "4. Dependencies installation complete."
 
 # 5. Reinstall CocoaPods Dependencies
 echo "5. Installing CocoaPods (native iOS dependencies)..."
 cd ios
+# Set UTF-8 encoding to fix CocoaPods Unicode issues
+export LANG=en_US.UTF-8
 pod install
 cd ..
 
