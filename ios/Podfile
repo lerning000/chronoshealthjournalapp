@@ -44,33 +44,7 @@ target 'ChronosApp' do
       # :ccache_enabled => true
     )
     
-    # Ensure codegen files are generated before build
-    installer.pods_project.targets.each do |target|
-      if target.name == 'ChronosApp'
-        target.build_phases.each do |phase|
-          if phase.is_a?(Xcodeproj::Project::Object::PBXShellScriptBuildPhase)
-            if phase.name == 'Bundle React Native code and images'
-              # Add codegen generation before bundling
-              phase.shell_script = <<~SCRIPT
-                set -e
-                
-                # Generate codegen files
-                export RCT_NEW_ARCH_ENABLED=0
-                export RCT_FABRIC_ENABLED=0
-                
-                WITH_ENVIRONMENT="../node_modules/react-native/scripts/generate-codegen-artifacts.js"
-                if [ -f "$WITH_ENVIRONMENT" ]; then
-                  node "$WITH_ENVIRONMENT" -p .. -t ios -o build/generated/ios
-                fi
-                
-                # Original bundle script
-                export NODE_BINARY=node
-                ../node_modules/react-native/scripts/react-native-xcode.sh
-              SCRIPT
-            end
-          end
-        end
-      end
-    end
+    # Fix codegen symbolic links after generation
+    system("cd #{Pod::Config.instance.installation_root}/.. && node scripts/fix-codegen-links.js")
   end
 end
