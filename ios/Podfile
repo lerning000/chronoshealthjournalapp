@@ -28,22 +28,6 @@ target 'ChronosApp' do
   )
 
   post_install do |installer|
-    installer.pods_project.targets.each do |target|
-      target.build_configurations.each do |config|
-        config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
-        # Ensure codegen files are properly included
-        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
-        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'RCT_NEW_ARCH_ENABLED=0'
-        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'RCT_FABRIC_ENABLED=0'
-        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'RCT_TURBOMODULE_ENABLED=0'
-        
-        # Additional settings for Hermes compatibility with Legacy Architecture
-        config.build_settings['GCC_C_LANGUAGE_STANDARD'] = 'c11'
-        config.build_settings['CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER'] = 'NO'
-        config.build_settings['CLANG_WARN_DOCUMENTATION_COMMENTS'] = 'NO'
-      end
-    end
-    
     # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
     react_native_post_install(
       installer,
@@ -52,17 +36,50 @@ target 'ChronosApp' do
       # :ccache_enabled => true
     )
     
-    # Force JSC usage by overriding Hermes settings
+    # Apply all custom build settings AFTER react_native_post_install to prevent overrides
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
+        # Force JSC instead of Hermes
         config.build_settings['USE_HERMES'] = 'NO'
         config.build_settings['USE_JSC'] = 'YES'
-        config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
+        
+        # Keep C++20 for React Native 0.81.4 compatibility (required for FuseboxTracer.cpp)
+        config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++20'
+        config.build_settings['GCC_C_LANGUAGE_STANDARD'] = 'gnu11'
+        
+        # Disable New Architecture (Fabric and TurboModules)
+        # Note: Don't define RCT_NEW_ARCH_ENABLED at all, because #ifdef checks if it's defined
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
+        # Remove any RCT_NEW_ARCH_ENABLED definitions that might have been added
+        if config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'].is_a?(Array)
+          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'].reject { |item| item.to_s.include?('RCT_NEW_ARCH_ENABLED') }
+        end
+        
         # Remove any Hermes-related compiler flags
         if config.build_settings['GCC_PREPROCESSOR_DEFINITIONS']
           config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'].reject { |item| item.include?('USE_HERMES') }
         end
+        
+        # Additional settings for compatibility
+        config.build_settings['CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER'] = 'NO'
+        config.build_settings['CLANG_WARN_DOCUMENTATION_COMMENTS'] = 'NO'
       end
+    end
+    
+    # Also update the main app project to disable New Architecture
+    installer.aggregate_targets.each do |aggregate_target|
+      aggregate_target.user_project.targets.each do |target|
+        target.build_configurations.each do |config|
+          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
+          # Remove RCT_NEW_ARCH_ENABLED completely (don't set it to 0, just remove it)
+          if config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'].is_a?(Array)
+            config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'].reject { |item| item.to_s.include?('RCT_NEW_ARCH_ENABLED') }
+          end
+          config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++20'
+          config.build_settings['USE_HERMES'] = 'NO'
+        end
+      end
+      aggregate_target.user_project.save
     end
     
     # Fix codegen symbolic links after generation
