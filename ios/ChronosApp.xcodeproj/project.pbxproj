@@ -120,12 +120,10 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "ChronosApp" */;
 			buildPhases = (
 				F84264F659321B4B94DEBF0A /* [CP] Check Pods Manifest.lock */,
-				F1A2B3C4D5E6F7G8H9I0J1K2 /* Fix Permissions */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				26DB384CD741CADC8D534C9E /* [CP] Embed Pods Frameworks */,
 				F3492E5B4AAAB0155C6BC9AE /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
@@ -201,37 +199,6 @@
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=/opt/homebrew/bin/node\nexport PATH=\"/opt/homebrew/bin:$PATH\"\nset -e\nexport SKIP_BUNDLING=1\nexport RCT_NO_LAUNCH_PACKAGER=1\n\n# Ensure proper permissions for node_modules and build directories\nchmod -R 755 ../node_modules 2>/dev/null || true\nchmod -R 755 ios 2>/dev/null || true\n\n# Check if node binary exists and is executable\nif [ ! -x \"$NODE_BINARY\" ]; then\n  echo \"Error: Node binary not found or not executable at $NODE_BINARY\"\n  exit 1\nfi\n\n# Run the React Native bundling script\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
-		26DB384CD741CADC8D534C9E /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ChronosApp/Pods-ChronosApp-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ChronosApp/Pods-ChronosApp-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ChronosApp/Pods-ChronosApp-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		F1A2B3C4D5E6F7G8H9I0J1K2 /* Fix Permissions */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Fix Permissions";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "cd \"${SRCROOT}/..\"\n./ios/scripts/fix-permissions.sh\n";
-		};
 		F3492E5B4AAAB0155C6BC9AE /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -240,9 +207,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ChronosApp/Pods-ChronosApp-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ChronosApp/Pods-ChronosApp-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
