@@ -198,7 +198,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"$REACT_NATIVE_PATH/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"$REACT_NATIVE_PATH/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
+			shellScript = "set -e\nexport NODE_BINARY=\"/opt/homebrew/bin/node\"\nexport RCT_NO_LAUNCH_PACKAGER=1\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
 		4927DF63E248E84D0815DA26 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -208,13 +208,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ChronosApp/Pods-ChronosApp-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ChronosApp/Pods-ChronosApp-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -229,13 +225,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ChronosApp/Pods-ChronosApp-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-ChronosApp/Pods-ChronosApp-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -294,10 +286,10 @@
 					"RCT_TURBOMODULE_ENABLED=0",
 				);
 				HEADER_SEARCH_PATHS = (
-  "$(inherited)",
-  "\"$(SRCROOT)/../node_modules/react-native/React\"",
-  "\"$(SRCROOT)/../node_modules/react-native/ReactCommon\"",
-);
+					"$(inherited)",
+					"\"$(SRCROOT)/../node_modules/react-native/React\"",
+					"\"$(SRCROOT)/../node_modules/react-native/ReactCommon\"",
+				);
 				"HEADER_SEARCH_PATHS[arch=*]" = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../node_modules/react-native/React\"",
@@ -417,10 +409,10 @@
 					"RCT_TURBOMODULE_ENABLED=0",
 				);
 				HEADER_SEARCH_PATHS = (
-  "$(inherited)",
-  "\"$(SRCROOT)/../node_modules/react-native/React\"",
-  "\"$(SRCROOT)/../node_modules/react-native/ReactCommon\"",
-);
+					"$(inherited)",
+					"\"$(SRCROOT)/../node_modules/react-native/React\"",
+					"\"$(SRCROOT)/../node_modules/react-native/ReactCommon\"",
+				);
 				"HEADER_SEARCH_PATHS[arch=*]" = (
 					"$(inherited)",
 					"\"$(SRCROOT)/../node_modules/react-native/React\"",
