@@ -16,7 +16,8 @@ target 'ChronosApp' do
 
   use_react_native!(
     :path => config[:reactNativePath],
-    :hermes_enabled => false
+    :hermes_enabled => false,
+    :new_arch_enabled => false
   )
 
   post_install do |installer|
@@ -29,6 +30,9 @@ target 'ChronosApp' do
     # Apply all custom build settings AFTER react_native_post_install to prevent overrides
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
+        # Set minimum iOS deployment target
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+        
         # Force JSC instead of Hermes
         config.build_settings['USE_HERMES'] = 'NO'
         config.build_settings['USE_JSC'] = 'YES'
@@ -53,6 +57,17 @@ target 'ChronosApp' do
         # Additional settings for compatibility
         config.build_settings['CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER'] = 'NO'
         config.build_settings['CLANG_WARN_DOCUMENTATION_COMMENTS'] = 'NO'
+      end
+    end
+    
+    # Fix for '[CP] Copy Pods Resources' build script
+    installer.pods_project.targets.each do |target|
+      target.build_phases.each do |build_phase|
+        if build_phase.respond_to?(:name) && build_phase.name == '[CP] Copy Pods Resources'
+          build_phase.output_paths = [
+            '$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/resources-to-copy-$(PODS_ROOT_SLUG).txt',
+          ]
+        end
       end
     end
     
