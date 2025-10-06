@@ -41,6 +41,9 @@ target 'ChronosApp' do
         config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++20'
         config.build_settings['GCC_C_LANGUAGE_STANDARD'] = 'gnu11'
         
+        # Set the C++ standard library
+        config.build_settings['CLANG_CXX_LIBRARY'] = 'libc++'
+        
         # Disable New Architecture (Fabric and TurboModules)
         # Note: Don't define RCT_NEW_ARCH_ENABLED at all, because #ifdef checks if it's defined
         config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
