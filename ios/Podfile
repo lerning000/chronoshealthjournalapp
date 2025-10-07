@@ -60,6 +60,7 @@ target 'ChronosApp' do
         # Additional settings for compatibility
         config.build_settings['CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER'] = 'NO'
         config.build_settings['CLANG_WARN_DOCUMENTATION_COMMENTS'] = 'NO'
+        config.build_settings['GCC_WARN_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
       end
     end
     
