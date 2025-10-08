@@ -9,7 +9,7 @@ require_relative '../node_modules/react-native/scripts/react_native_pods'
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
-use_frameworks! :linkage => :static
+# use_frameworks! :linkage => :static  # Disabled for better RN compatibility
 
 target 'ChronosApp' do
   config = use_native_modules!
@@ -26,6 +26,14 @@ target 'ChronosApp' do
       installer,
       :mac_catalyst_enabled => false
     )
+    
+    # Disable user script sandboxing for all Pods targets (fixes Xcode 15+ sandbox errors)
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['ENABLE_USER_SCRIPT_SANDBOXING'] = 'NO'
+      end
+    end
+    installer.pods_project.save
     
     # Apply all custom build settings AFTER react_native_post_install to prevent overrides
     installer.pods_project.targets.each do |target|
@@ -75,10 +83,13 @@ target 'ChronosApp' do
       end
     end
     
-    # Also update the main app project to disable New Architecture
+    # Also update the main app project to disable New Architecture and user script sandboxing
     installer.aggregate_targets.each do |aggregate_target|
       aggregate_target.user_project.targets.each do |target|
         target.build_configurations.each do |config|
+          # Disable user script sandboxing for app targets
+          config.build_settings['ENABLE_USER_SCRIPT_SANDBOXING'] = 'NO'
+          
           config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
           # Remove RCT_NEW_ARCH_ENABLED completely (don't set it to 0, just remove it)
           if config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'].is_a?(Array)
