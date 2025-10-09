@@ -9,5 +9,5 @@ There are no user accounts, analytics, or cloud syncing.
 
 If you delete the app, all stored data is permanently removed from your device.
 
-**Contact:** arjunpillai@berkeley.edu
+**Contact:** lerning000@gmail.com
 
