@@ -1,0 +1,52 @@
+=== CHRONOS APP RELEASE BUILD - STATUS REPORT ===
+
+✅ BUNDLE GENERATION:
+  • ios/main.jsbundle exists in repo: YES (1.2MB generated)
+  • Added to Copy Bundle Resources: YES (PBXFileReference UUID: AABBCCDD1122334455667788, PBXBuildFile UUID: EEFF00111122334455667788)
+  • Bundle found inside built .app: YES (ios/build/Release-iphonesimulator/ChronosApp.app/main.jsbundle - 1.2MB)
+
+✅ BUILD PHASE SCRIPT:
+  • "Bundle React Native code and images" script updated: YES
+  • Script normalized to 3 lines:
+      - export NODE_BINARY=node
+      - export RCT_NO_LAUNCH_PACKAGER=1
+      - "$PROJECT_DIR/../node_modules/react-native/scripts/react-native-xcode.sh"
+  • showEnvVarsInLog: YES (set to 1)
+  • "Based on dependency analysis": OFF (removed alwaysOutOfDate=1, dependency analysis disabled)
+  • runOnlyForDeploymentPostprocessing: YES (1 = for install builds only)
+
+✅ SIMULATOR BUILD & RUN:
+  • Simulator used: iPhone 16 Pro (iOS 18.6)
+  • Configuration: Release  
+  • Build completed: YES (all targets built successfully)
+  • main.jsbundle copied to .app: YES (confirmed in build log)
+  • hermes.framework embedded: YES (despite Podfile settings)
+  • App installed to simulator: YES
+  • App stayed open: NO - App crashed immediately after launch
+
+❌ CRASH ANALYSIS:
+  • App launched with PID 67572
+  • Process terminated within 3 seconds
+  • Crash location: RNSScreenNavigationContainer.mm (react-native-screens)
+  • Thread: com.facebook.react.ExceptionsManagerQueue
+  • Root cause: Fatal JavaScript exception in ExceptionsManager
+  • Hermes threads active: YES ("hades" GC thread present in crash)
+
+🔍 ISSUE IDENTIFIED:
+The app crashes due to USE_HERMES configuration mismatch:
+  1. Podfile sets :hermes_enabled => false (JSC expected)
+  2. project.pbxproj has USE_HERMES = true in Debug+Release configs (user reverted)
+  3. Hermes framework is being embedded and initialized
+  4. main.jsbundle was built for JSC (--dev false, no hermes bytecode)
+  5. Conflict between Hermes engine loading and JSC bundle causes crash
+
+📁 LOG FILES AVAILABLE:
+  • tmp_logs/build_full.log - Complete xcodebuild output
+  • tmp_logs/build_head.txt - First 200 lines of build log
+  • tmp_logs/chronos_crash.ips - Latest simulator crash report
+  • tmp_logs/js_error.txt - Extracted JavaScript exception details
+  • tmp_logs/summary.txt - This file
+
+🔧 FIX REQUIRED:
+Set USE_HERMES = NO in ios/ChronosApp.xcodeproj/project.pbxproj for ALL configurations (Debug+Release)
+to match Podfile settings, then rebuild.
