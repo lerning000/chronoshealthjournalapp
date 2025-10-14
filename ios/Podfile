@@ -45,6 +45,17 @@ target 'ChronosApp' do
         config.build_settings['USE_HERMES'] = 'NO'
         config.build_settings['USE_JSC'] = 'YES'
         
+        # Remove Hermes framework from linker flags
+        if config.build_settings['OTHER_LDFLAGS']
+          if config.build_settings['OTHER_LDFLAGS'].is_a?(String)
+            config.build_settings['OTHER_LDFLAGS'] = config.build_settings['OTHER_LDFLAGS'].gsub('-framework "hermes"', '').gsub('-framework hermes', '')
+          elsif config.build_settings['OTHER_LDFLAGS'].is_a?(Array)
+            config.build_settings['OTHER_LDFLAGS'] = config.build_settings['OTHER_LDFLAGS'].map do |flag|
+              flag.to_s.gsub('-framework "hermes"', '').gsub('-framework hermes', '')
+            end
+          end
+        end
+        
         # Keep C++20 for React Native 0.81.4 compatibility (required for FuseboxTracer.cpp)
         config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++20'
         config.build_settings['GCC_C_LANGUAGE_STANDARD'] = 'gnu11'
@@ -72,15 +83,16 @@ target 'ChronosApp' do
       end
     end
     
-    # Fix for '[CP] Copy Pods Resources' build script
-    installer.pods_project.targets.each do |target|
-      target.build_phases.each do |build_phase|
-        if build_phase.respond_to?(:name) && build_phase.name == '[CP] Copy Pods Resources'
-          build_phase.output_paths = [
-            '$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/resources-to-copy-$(PODS_ROOT_SLUG).txt',
-          ]
+    # Remove Hermes framework from Embed Frameworks phase
+    installer.aggregate_targets.each do |aggregate_target|
+      aggregate_target.user_project.targets.each do |target|
+        target.build_phases.each do |build_phase|
+          if build_phase.respond_to?(:name) && build_phase.name == '[CP] Embed Pods Frameworks'
+            build_phase.shell_script.gsub!(/.*hermes\.framework.*\n/, '')
+          end
         end
       end
+      aggregate_target.user_project.save
     end
     
     # Also update the main app project to disable New Architecture and user script sandboxing
@@ -104,5 +116,13 @@ target 'ChronosApp' do
     
     # Fix codegen symbolic links after generation
     system("cd #{Pod::Config.instance.installation_root}/.. && node scripts/fix-codegen-links.js")
+    
+    # Remove Hermes framework from generated xcconfig files (must be done after config generation)
+    Dir.glob("#{Pod::Config.instance.installation_root}/Target Support Files/**/*.xcconfig").each do |config_file|
+      xcconfig_content = File.read(config_file)
+      xcconfig_content.gsub!(/-framework "hermes"/, '')
+      xcconfig_content.gsub!(/-framework hermes/, '')
+      File.write(config_file, xcconfig_content)
+    end
   end
 end
