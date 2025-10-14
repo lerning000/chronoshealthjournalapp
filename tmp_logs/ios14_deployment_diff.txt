@@ -1,0 +1,54 @@
+=== iOS DEPLOYMENT TARGET RAISED TO 14.0 ===
+
+FILES CHANGED:
+1. ios/ChronosApp.xcodeproj/project.pbxproj
+2. ios/Podfile
+
+CHANGES:
+
+## ios/ChronosApp.xcodeproj/project.pbxproj
+────────────────────────────────────────────
+
+Line 377 (Debug - Project level):
+-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
++				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+
+Line 501 (Release - Project level):
+-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
++				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+
+Line 586 (Debug - ChronosApp target):
+-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
++				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+
+Line 670 (Release - ChronosApp target):
+-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
++				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+
+Total: 4 occurrences changed
+
+
+## ios/Podfile
+────────────────────────────────────────────
+
+Line 42 (post_install hook):
+-        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
++        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
+
+Total: 1 occurrence changed
+
+
+VERIFICATION:
+✅ pod install completed successfully
+✅ All pods now target iOS 14.0+
+✅ Codegen regenerated successfully
+✅ 75 total pods installed
+✅ Configuration: Legacy Architecture, JSC-only
+
+SUMMARY:
+- Minimum iOS version: 13.0 → 14.0
+- Affects: ALL build configurations (Debug + Release)
+- Affects: Project-level AND target-level settings
+- Affects: All CocoaPods dependencies (via post_install)
+- No other changes made to scheme or bundle scripts
+
