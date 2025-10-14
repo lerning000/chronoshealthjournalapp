@@ -45,6 +45,9 @@ target 'ChronosApp' do
         config.build_settings['USE_HERMES'] = 'NO'
         config.build_settings['USE_JSC'] = 'YES'
         
+        # Explicitly disable New Architecture
+        config.build_settings['RCT_NEW_ARCH_ENABLED'] = '0'
+        
         # Remove Hermes framework from linker flags
         if config.build_settings['OTHER_LDFLAGS']
           if config.build_settings['OTHER_LDFLAGS'].is_a?(String)

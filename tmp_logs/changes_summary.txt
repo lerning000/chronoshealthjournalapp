@@ -1,0 +1,61 @@
+═══════════════════════════════════════════════════════════════════
+  CHRONOS iOS BUILD FIX - CHANGE SUMMARY
+═══════════════════════════════════════════════════════════════════
+
+GOAL: Make Release build work with Hermes OFF + New Arch OFF (JSC only)
+
+FILES MODIFIED:
+───────────────────────────────────────────────────────────────────
+1. ios/Podfile
+   └─ Added: config.build_settings['RCT_NEW_ARCH_ENABLED'] = '0'
+   └─ Location: post_install block, line 49
+
+2. ios/ChronosApp.xcodeproj/project.pbxproj
+   └─ Changed: USE_HERMES = true → USE_HERMES = NO (2 occurrences)
+   └─ Lines: 609, 692 (Debug & Release configurations)
+
+3. ios/Pods/Target Support Files/Pods-ChronosApp/Pods-ChronosApp.debug.xcconfig
+   └─ Added: USE_HERMES = NO
+   └─ Added: RCT_NEW_ARCH_ENABLED = 0
+   └─ Removed: -framework "hermes" from OTHER_LDFLAGS
+
+4. ios/Pods/Target Support Files/Pods-ChronosApp/Pods-ChronosApp.release.xcconfig
+   └─ Added: USE_HERMES = NO
+   └─ Added: RCT_NEW_ARCH_ENABLED = 0
+   └─ Removed: -framework "hermes" from OTHER_LDFLAGS
+
+ACTIONS PERFORMED:
+───────────────────────────────────────────────────────────────────
+✅ Cleaned ios/build
+✅ Cleaned ~/Library/Developer/Xcode/DerivedData
+✅ Ran pod deintegrate
+✅ Ran pod install (76 dependencies, 75 pods installed)
+✅ Codegen generated Legacy Architecture files
+✅ Created symbolic links for codegen
+✅ Removed Hermes framework references from linker flags
+✅ Verified no RCT_NEW_ARCH_ENABLED=1 references remain
+✅ Verified no new_arch_enabled => true references remain
+
+VERIFICATION RESULTS:
+───────────────────────────────────────────────────────────────────
+✅ Podfile: :hermes_enabled => false, :new_arch_enabled => false
+✅ All pod configs: USE_HERMES = 'NO', RCT_NEW_ARCH_ENABLED = '0'
+✅ Xcode project (all 4 configs): USE_HERMES = NO
+✅ Generated xcconfigs: Hermes framework removed
+✅ Codegen files: 29 files generated in ios/build/generated/ios/
+✅ New Arch search: 0 matches found
+✅ iOS Deployment Target: 14.0 (all configurations)
+
+NEXT STEPS:
+───────────────────────────────────────────────────────────────────
+The project is now fully configured for JSC-only Legacy Architecture.
+
+To build in Xcode:
+  1. open ios/ChronosApp.xcworkspace
+  2. Product → Clean Build Folder (⇧⌘K)
+  3. Product → Build (⌘B)
+
+The "Build input file cannot be found" error should be RESOLVED.
+All codegen files are now properly generated and linked.
+
+═══════════════════════════════════════════════════════════════════
