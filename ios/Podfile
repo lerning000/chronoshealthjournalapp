@@ -17,6 +17,7 @@ target 'ChronosApp' do
   use_react_native!(
     :path => config[:reactNativePath],
     :hermes_enabled => false,
+    :fabric_enabled => false,
     :new_arch_enabled => false
   )
 
@@ -47,6 +48,12 @@ target 'ChronosApp' do
         
         # Explicitly disable New Architecture
         config.build_settings['RCT_NEW_ARCH_ENABLED'] = '0'
+        
+        # Add USE_HERMES=0 to preprocessor definitions to prevent Hermes header includes
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
+        if config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'].is_a?(Array)
+          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'USE_HERMES=0' unless config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'].include?('USE_HERMES=0')
+        end
         
         # Remove Hermes framework from linker flags
         if config.build_settings['OTHER_LDFLAGS']
@@ -120,12 +127,34 @@ target 'ChronosApp' do
     # Fix codegen symbolic links after generation
     system("cd #{Pod::Config.instance.installation_root}/.. && node scripts/fix-codegen-links.js")
     
-    # Remove Hermes framework from generated xcconfig files (must be done after config generation)
+    # Remove Hermes framework from generated xcconfig files and add USE_HERMES=0 preprocessor definition
     Dir.glob("#{Pod::Config.instance.installation_root}/Target Support Files/**/*.xcconfig").each do |config_file|
       xcconfig_content = File.read(config_file)
       xcconfig_content.gsub!(/-framework "hermes"/, '')
       xcconfig_content.gsub!(/-framework hermes/, '')
+      
+      # Add USE_HERMES=0 to GCC_PREPROCESSOR_DEFINITIONS if not already present
+      unless xcconfig_content.include?('USE_HERMES=0')
+        if xcconfig_content =~ /GCC_PREPROCESSOR_DEFINITIONS\s*=\s*(.+)$/
+          xcconfig_content.gsub!(/GCC_PREPROCESSOR_DEFINITIONS\s*=\s*(.+)$/, 'GCC_PREPROCESSOR_DEFINITIONS = \1 USE_HERMES=0')
+        else
+          xcconfig_content += "\nGCC_PREPROCESSOR_DEFINITIONS = $(inherited) USE_HERMES=0\n"
+        end
+      end
+      
       File.write(config_file, xcconfig_content)
     end
+    
+    # Remove Hermes pod targets completely (not needed with JSC-only)
+    hermes_targets = ['hermes-engine', 'React-hermes', 'React-RuntimeHermes', 'hermesvm']
+    installer.pods_project.targets.delete_if do |target|
+      if hermes_targets.include?(target.name)
+        puts "🗑️  Removing Hermes target: #{target.name}"
+        true
+      else
+        false
+      end
+    end
+    installer.pods_project.save
   end
 end
