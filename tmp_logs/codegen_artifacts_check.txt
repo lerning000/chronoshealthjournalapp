@@ -1,0 +1,33 @@
+═══════════════════════════════════════════════════════════════════
+  CODEGEN ARTIFACTS SANITY CHECK
+═══════════════════════════════════════════════════════════════════
+
+Checking ios/build/generated/ios directory...
+
+✅ ios/build/generated/ios: EXISTS
+
+Total files generated: 27
+
+Key generated files:
+  ✅ RCTAppDependencyProvider.h
+  ✅ RCTAppDependencyProvider.mm
+  ✅ RCTModuleProviders.h
+  ✅ RCTModuleProviders.mm
+  ✅ RCTThirdPartyComponentsProvider.h
+  ✅ RCTThirdPartyComponentsProvider.mm
+
+React renderer components:
+  ✅ react/renderer/components: EXISTS
+     Path: /Users/arjunpillai/Projects/chronoshealthjournalapp/ios/build/generated/ios/react/renderer/components
+
+Third-party library codegen:
+  ✅ RNMmkvSpec: present
+  ✅ safeareacontext: present
+  ✅ rnscreens: present
+
+Symbolic links:
+  ✅ 5 symbolic links created
+
+RESULT: Codegen artifacts present ✅
+
+═══════════════════════════════════════════════════════════════════

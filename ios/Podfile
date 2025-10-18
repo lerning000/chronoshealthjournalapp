@@ -22,139 +22,32 @@ target 'ChronosApp' do
   )
 
   post_install do |installer|
-    # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
+    # Keep RN's usual tweaks:
     react_native_post_install(
       installer,
-      :mac_catalyst_enabled => false
+      # leave as-is if you already have this helper available:
+      mac_catalyst_enabled: false
     )
-    
-    # Disable user script sandboxing for all Pods targets (fixes Xcode 15+ sandbox errors)
-    installer.pods_project.targets.each do |target|
-      target.build_configurations.each do |config|
-        config.build_settings['ENABLE_USER_SCRIPT_SANDBOXING'] = 'NO'
-      end
-    end
-    installer.pods_project.save
-    
-    # Apply all custom build settings AFTER react_native_post_install to prevent overrides
-    installer.pods_project.targets.each do |target|
-      target.build_configurations.each do |config|
-        # Set minimum iOS deployment target
-        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
-        
-        # Force JSC instead of Hermes
+
+    installer.pods_project.targets.each do |t|
+      t.build_configurations.each do |config|
+        # 1) Explicitly disable Hermes / enable JSC
         config.build_settings['USE_HERMES'] = 'NO'
-        config.build_settings['USE_JSC'] = 'YES'
-        
-        # Explicitly disable New Architecture
-        config.build_settings['RCT_NEW_ARCH_ENABLED'] = '0'
-        
-        # Add USE_HERMES=0 to preprocessor definitions to prevent Hermes header includes
-        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
-        if config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'].is_a?(Array)
-          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'USE_HERMES=0' unless config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'].include?('USE_HERMES=0')
-        end
-        
-        # Remove Hermes framework from linker flags
-        if config.build_settings['OTHER_LDFLAGS']
-          if config.build_settings['OTHER_LDFLAGS'].is_a?(String)
-            config.build_settings['OTHER_LDFLAGS'] = config.build_settings['OTHER_LDFLAGS'].gsub('-framework "hermes"', '').gsub('-framework hermes', '')
-          elsif config.build_settings['OTHER_LDFLAGS'].is_a?(Array)
-            config.build_settings['OTHER_LDFLAGS'] = config.build_settings['OTHER_LDFLAGS'].map do |flag|
-              flag.to_s.gsub('-framework "hermes"', '').gsub('-framework hermes', '')
-            end
-          end
-        end
-        
-        # Keep C++20 for React Native 0.81.4 compatibility (required for FuseboxTracer.cpp)
-        config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++20'
-        config.build_settings['GCC_C_LANGUAGE_STANDARD'] = 'gnu11'
-        
-        # Set the C++ standard library
-        config.build_settings['CLANG_CXX_LIBRARY'] = 'libc++'
-        
-        # Disable New Architecture (Fabric and TurboModules)
-        # Note: Don't define RCT_NEW_ARCH_ENABLED at all, because #ifdef checks if it's defined
-        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
-        # Remove any RCT_NEW_ARCH_ENABLED definitions that might have been added
-        if config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'].is_a?(Array)
-          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'].reject { |item| item.to_s.include?('RCT_NEW_ARCH_ENABLED') }
-        end
-        
-        # Remove any Hermes-related compiler flags
-        if config.build_settings['GCC_PREPROCESSOR_DEFINITIONS']
-          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'].reject { |item| item.include?('USE_HERMES') }
-        end
-        
-        # Additional settings for compatibility
-        config.build_settings['CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER'] = 'NO'
-        config.build_settings['CLANG_WARN_DOCUMENTATION_COMMENTS'] = 'NO'
-        config.build_settings['GCC_WARN_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
+        config.build_settings['USE_JSC']    = 'YES'
+
+        # 2) Force the C/C++ macros so #if USE_HERMES evaluates to 0
+        defs = config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] || ['$(inherited)']
+        defs = defs.is_a?(Array) ? defs : defs.to_s.split(' ')
+        defs << 'USE_HERMES=0' unless defs.any? { |d| d.include?('USE_HERMES=0') }
+        defs << 'USE_JSC=1'   unless defs.any? { |d| d.include?('USE_JSC=1') }
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = defs
+
+        # 3) Remove any Hermes header search paths that might still be cached
+        hsp = config.build_settings['HEADER_SEARCH_PATHS'] || ['$(inherited)']
+        hsp = hsp.is_a?(Array) ? hsp : hsp.to_s.split(' ')
+        hsp.reject! { |p| p.to_s.downcase.include?('hermes') }
+        config.build_settings['HEADER_SEARCH_PATHS'] = hsp
       end
     end
-    
-    # Remove Hermes framework from Embed Frameworks phase
-    installer.aggregate_targets.each do |aggregate_target|
-      aggregate_target.user_project.targets.each do |target|
-        target.build_phases.each do |build_phase|
-          if build_phase.respond_to?(:name) && build_phase.name == '[CP] Embed Pods Frameworks'
-            build_phase.shell_script.gsub!(/.*hermes\.framework.*\n/, '')
-          end
-        end
-      end
-      aggregate_target.user_project.save
-    end
-    
-    # Also update the main app project to disable New Architecture and user script sandboxing
-    installer.aggregate_targets.each do |aggregate_target|
-      aggregate_target.user_project.targets.each do |target|
-        target.build_configurations.each do |config|
-          # Disable user script sandboxing for app targets
-          config.build_settings['ENABLE_USER_SCRIPT_SANDBOXING'] = 'NO'
-          
-          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
-          # Remove RCT_NEW_ARCH_ENABLED completely (don't set it to 0, just remove it)
-          if config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'].is_a?(Array)
-            config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'].reject { |item| item.to_s.include?('RCT_NEW_ARCH_ENABLED') }
-          end
-          config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++20'
-          config.build_settings['USE_HERMES'] = 'NO'
-        end
-      end
-      aggregate_target.user_project.save
-    end
-    
-    # Fix codegen symbolic links after generation
-    system("cd #{Pod::Config.instance.installation_root}/.. && node scripts/fix-codegen-links.js")
-    
-    # Remove Hermes framework from generated xcconfig files and add USE_HERMES=0 preprocessor definition
-    Dir.glob("#{Pod::Config.instance.installation_root}/Target Support Files/**/*.xcconfig").each do |config_file|
-      xcconfig_content = File.read(config_file)
-      xcconfig_content.gsub!(/-framework "hermes"/, '')
-      xcconfig_content.gsub!(/-framework hermes/, '')
-      
-      # Add USE_HERMES=0 to GCC_PREPROCESSOR_DEFINITIONS if not already present
-      unless xcconfig_content.include?('USE_HERMES=0')
-        if xcconfig_content =~ /GCC_PREPROCESSOR_DEFINITIONS\s*=\s*(.+)$/
-          xcconfig_content.gsub!(/GCC_PREPROCESSOR_DEFINITIONS\s*=\s*(.+)$/, 'GCC_PREPROCESSOR_DEFINITIONS = \1 USE_HERMES=0')
-        else
-          xcconfig_content += "\nGCC_PREPROCESSOR_DEFINITIONS = $(inherited) USE_HERMES=0\n"
-        end
-      end
-      
-      File.write(config_file, xcconfig_content)
-    end
-    
-    # Remove Hermes pod targets completely (not needed with JSC-only)
-    hermes_targets = ['hermes-engine', 'React-hermes', 'React-RuntimeHermes', 'hermesvm']
-    installer.pods_project.targets.delete_if do |target|
-      if hermes_targets.include?(target.name)
-        puts "🗑️  Removing Hermes target: #{target.name}"
-        true
-      else
-        false
-      end
-    end
-    installer.pods_project.save
   end
 end

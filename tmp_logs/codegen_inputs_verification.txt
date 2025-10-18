@@ -1,0 +1,16 @@
+═══════════════════════════════════════════════════════════════════
+  CODEGEN INPUTS VERIFICATION
+═══════════════════════════════════════════════════════════════════
+
+Checking required codegen input files/directories...
+
+✅ node_modules/react-native/sdks: EXISTS
+   Path: /Users/arjunpillai/Projects/chronoshealthjournalapp/node_modules/react-native/sdks
+⚠️  node_modules/react-native/scripts/generate-specs.sh: NOT FOUND
+⚠️  node_modules/react-native/React/Codegen: NOT FOUND
+⚠️  ios/Pods/Headers/Private/React-Codegen: NOT FOUND (will be created during build)
+
+Hermes SDK check (should NOT be required):
+✅ node_modules/react-native/sdks/hermes: NOT PRESENT (correct for JSC-only)
+
+═══════════════════════════════════════════════════════════════════
